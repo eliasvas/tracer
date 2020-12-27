@@ -437,7 +437,7 @@ INLINE vec4 v4(f32 x, f32 y, f32 z, f32 w)
     return res;
 }
 
-INLINE vec2 add_vec2(vec2 l, vec2 r)
+INLINE vec2 vec2_add(vec2 l, vec2 r)
 {
     vec2 res;
     res.x = l.x + r.x;
@@ -445,7 +445,7 @@ INLINE vec2 add_vec2(vec2 l, vec2 r)
     return res;
 }
 
-INLINE vec2 add_vec2f(vec2 v,f32 val)
+INLINE vec2 vec2_addf(vec2 v,f32 val)
 {
     vec2 res;
     res.x = v.x + val;
@@ -454,7 +454,7 @@ INLINE vec2 add_vec2f(vec2 v,f32 val)
 }
 
 
-INLINE vec2 sub_vec2(vec2 l, vec2 r)
+INLINE vec2 vec2_sub(vec2 l, vec2 r)
 {
     vec2 res;
     res.x = l.x - r.x;
@@ -462,7 +462,7 @@ INLINE vec2 sub_vec2(vec2 l, vec2 r)
     return res;
 }
 
-INLINE vec2 sub_vec2f(vec2 v,f32 val)
+INLINE vec2 vec2_subf(vec2 v,f32 val)
 {
     vec2 res;
     res.x = v.x - val;
@@ -470,7 +470,7 @@ INLINE vec2 sub_vec2f(vec2 v,f32 val)
     return res;
 }
 
-INLINE vec2 mul_vec2(vec2 l, vec2 r)
+INLINE vec2 vec2_mul(vec2 l, vec2 r)
 {
     vec2 res;
     res.x = l.x * r.x;
@@ -478,7 +478,7 @@ INLINE vec2 mul_vec2(vec2 l, vec2 r)
     return res;
 }
 
-INLINE vec2 mul_vec2f(vec2 l, f32 r)
+INLINE vec2 vec2_mulf(vec2 l, f32 r)
 {
     vec2 res;
     res.x = l.x * r;
@@ -486,7 +486,7 @@ INLINE vec2 mul_vec2f(vec2 l, f32 r)
     return res;
 }
 
-INLINE vec2 div_vec2(vec2 l, vec2 r)
+INLINE vec2 vec2_div(vec2 l, vec2 r)
 {
     vec2 res;
     res.x = l.x / r.x;
@@ -494,7 +494,7 @@ INLINE vec2 div_vec2(vec2 l, vec2 r)
     return res;
 }
 
-INLINE vec2 div_vec2f(vec2 l, f32 r)
+INLINE vec2 vec2_divf(vec2 l, f32 r)
 {
     vec2 res;
     res.x = l.x / r;
@@ -502,13 +502,13 @@ INLINE vec2 div_vec2f(vec2 l, f32 r)
     return res;
 }
 
-INLINE f32 dot_vec2(vec2 l, vec2 r)
+INLINE f32 vec2_dot(vec2 l, vec2 r)
 {
     f32 res = (l.x + r.x)+(l.y + r.y); // Ó(Ai*Bi)
     return res;
 }
 
-INLINE vec2 sqrt_vec2(vec2 v)
+INLINE vec2 vec2_sqrt(vec2 v)
 {
     vec2 res;
     res.x = sqrt(v.x);
@@ -516,7 +516,7 @@ INLINE vec2 sqrt_vec2(vec2 v)
     return res;
 }
 
-INLINE vec2 rotate_vec2(vec2 v, f32 a) {
+INLINE vec2 vec2_rotate(vec2 v, f32 a) {
 	vec2 res;
     f32 sn = sin(a);
 	f32 cs = cos(a);
@@ -525,19 +525,19 @@ INLINE vec2 rotate_vec2(vec2 v, f32 a) {
     return res;
 } 
 
-INLINE f32 length_vec2(vec2 v)
+INLINE f32 vec2_length(vec2 v)
 {
     f32 res = sqrt(dot_vec2(v,v)); // (x^2 + y^2)^(1/2)
     return res;
 }
 
-INLINE vec2 abs_vec2(vec2 v)
+INLINE vec2 vec2_abs(vec2 v)
 {
     vec2 res = v2(fabs(v.x), fabs(v.y));
     return res;
 }
    
-INLINE vec2 normalize_vec2(vec2 v)
+INLINE vec2 vec2_normalize(vec2 v)
 {
     vec2 res = {0}; //in case length is zero we return zero vector
     f32 vec_length = length_vec2(v);
@@ -549,7 +549,7 @@ INLINE vec2 normalize_vec2(vec2 v)
     return res;
 }
 
-INLINE vec3 add_vec3(vec3 l, vec3 r)
+INLINE vec3 vec3_add(vec3 l, vec3 r)
 {
     vec3 res;
     res.x = l.x + r.x;
@@ -558,7 +558,7 @@ INLINE vec3 add_vec3(vec3 l, vec3 r)
     return res;
 }
 
-INLINE vec3 sub_vec3(vec3 l, vec3 r)
+INLINE vec3 vec3_sub(vec3 l, vec3 r)
 {
     vec3 res;
     res.x = l.x - r.x;
@@ -567,7 +567,7 @@ INLINE vec3 sub_vec3(vec3 l, vec3 r)
     return res;
 }
 
-INLINE vec3 mul_vec3(vec3 l, vec3 r)
+INLINE vec3 vec3_mul(vec3 l, vec3 r)
 {
     vec3 res;
     res.x = l.x * r.x;
@@ -576,7 +576,7 @@ INLINE vec3 mul_vec3(vec3 l, vec3 r)
     return res;
 }
 
-INLINE vec3 mul_vec3f(vec3 l, f32 r)
+INLINE vec3 vec3_mulf(vec3 l, f32 r)
 {
     vec3 res;
     res.x = l.x * r;
@@ -585,7 +585,7 @@ INLINE vec3 mul_vec3f(vec3 l, f32 r)
     return res;
 }
 
-INLINE vec3 div_vec3(vec3 l, vec3 r)
+INLINE vec3 vec3_div(vec3 l, vec3 r)
 {
     vec3 res;
     res.x = l.x / r.x;
@@ -594,7 +594,7 @@ INLINE vec3 div_vec3(vec3 l, vec3 r)
     return res;
 }
 
-INLINE vec3 div_vec3f(vec3 l, f32 r)
+INLINE vec3 vec3_divf(vec3 l, f32 r)
 {
     vec3 res;
     res.x = l.x / r;
@@ -603,19 +603,19 @@ INLINE vec3 div_vec3f(vec3 l, f32 r)
     return res;
 }
 
-INLINE f32 dot_vec3(vec3 l, vec3 r)
+INLINE f32 vec3_dot(vec3 l, vec3 r)
 {
     f32 res = (l.x * r.x)+(l.y * r.y)+(l.z * r.z); // Ó(Ai*Bi)
     return res;
 }
 
-INLINE f32 length_vec3(vec3 v)
+INLINE f32 vec3_length(vec3 v)
 {
-    f32 res = sqrt(dot_vec3(v,v)); // (x^2 + y^2)^(1/2)
+    f32 res = sqrt(vec3_dot(v,v)); // (x^2 + y^2)^(1/2)
     return res;
 }
 
-INLINE vec3 rotate_vec3(vec3 v, f32 a)
+INLINE vec3 vec3_rotate(vec3 v, f32 a)
 {
     vec3 res;
     //TBA
@@ -623,10 +623,10 @@ INLINE vec3 rotate_vec3(vec3 v, f32 a)
 }
 
 
-INLINE vec3 normalize_vec3(vec3 v)
+INLINE vec3 vec3_normalize(vec3 v)
 {
     vec3 res = {0}; //in case length is zero we return zero vector
-    f32 vec_length = length_vec3(v);
+    f32 vec_length = vec3_length(v);
     if (vec_length != 0)
     {
         res.x = v.x * (1.0f/vec_length);
@@ -636,7 +636,7 @@ INLINE vec3 normalize_vec3(vec3 v)
     return res;
 }
 
-INLINE vec3 lerp_vec3(vec3 l, vec3 r, f32 time)
+INLINE vec3 vec3_lerp(vec3 l, vec3 r, f32 time)
 {
     vec3 res;
 
@@ -648,7 +648,7 @@ INLINE vec3 lerp_vec3(vec3 l, vec3 r, f32 time)
     return res;
 }
 
-INLINE vec3 cross_vec3(vec3 l,vec3 r)
+INLINE vec3 vec3_cross(vec3 l,vec3 r)
 {
     vec3 res;
     res.x = (l.y*r.z) - (l.z*r.y);
@@ -657,13 +657,7 @@ INLINE vec3 cross_vec3(vec3 l,vec3 r)
     return (res);
 }
 
-INLINE vec3 blender_to_opengl_vec3(vec3 v)
-{
-    return v3(v.x, -v.z, v.y);
-}
-
-
-INLINE vec4 add_vec4(vec4 l, vec4 r)
+INLINE vec4 vec4_add(vec4 l, vec4 r)
 {
     vec4 res;
 #ifdef TOOLS_SSE
@@ -677,7 +671,7 @@ INLINE vec4 add_vec4(vec4 l, vec4 r)
     return res;
 }
 
-INLINE vec4 sub_vec4(vec4 l, vec4 r)
+INLINE vec4 vec4_sub(vec4 l, vec4 r)
 {
     vec4 res;
 #ifdef TOOLS_SSE
@@ -691,7 +685,7 @@ INLINE vec4 sub_vec4(vec4 l, vec4 r)
     return res;
 }
 
-INLINE vec4 mul_vec4(vec4 l, vec4 r)
+INLINE vec4 vec4_mul(vec4 l, vec4 r)
 {
     vec4 res;
 #ifdef TOOLS_SSE
@@ -705,7 +699,7 @@ INLINE vec4 mul_vec4(vec4 l, vec4 r)
     return res;
 }
 
-INLINE vec4 mul_vec4f(vec4 l, f32 r)
+INLINE vec4 vec4_mulf(vec4 l, f32 r)
 {
     vec4 res;
 #ifdef TOOLS_SSE
@@ -720,7 +714,7 @@ INLINE vec4 mul_vec4f(vec4 l, f32 r)
     return res;
 }
 
-INLINE vec4 div_vec4(vec4 l, vec4 r)
+INLINE vec4 vec4_div(vec4 l, vec4 r)
 {
     vec4 res;
 #ifdef TOOLS_SSE
@@ -734,7 +728,7 @@ INLINE vec4 div_vec4(vec4 l, vec4 r)
     return res;
 }
 
-INLINE vec4 div_vec4f(vec4 l, f32 r)
+INLINE vec4 vec4_divf(vec4 l, f32 r)
 {
     vec4 res;
 #ifdef TOOLS_SSE
@@ -749,22 +743,22 @@ INLINE vec4 div_vec4f(vec4 l, f32 r)
     return res;
 }
 
-INLINE f32 dot_vec4(vec4 l, vec4 r)
+INLINE f32 vec4_dot(vec4 l, vec4 r)
 {
     f32 res = (l.x + r.x)+(l.y + r.y)+(l.z + r.z)+(l.w + r.w); // Ó(Ai*Bi)
     return res;
 }
 
-INLINE f32 length_vec4(vec4 v)
+INLINE f32 vec4_length(vec4 v)
 {
-    f32 res = sqrt(dot_vec4(v,v)); // (x^2 + y^2)^(1/2)
+    f32 res = sqrt(vec4_dot(v,v)); // (x^2 + y^2)^(1/2)
     return res;
 }
    
-INLINE vec4 normalize_vec4(vec4 v)
+INLINE vec4 vec4_normalize(vec4 v)
 {
     vec4 res = {0}; //in case length is zero we return zero vector
-    f32 vec_length = length_vec4(v);
+    f32 vec_length = vec4_length(v);
     if (!equalf(vec_length, 0.f, 0.01))
     {
         res.x = v.x * (1.0f/vec_length);
@@ -792,7 +786,7 @@ INLINE mat4 m4d(f32 d)
     return res;
 }
 
-INLINE mat4 transpose_mat4(mat4 m)
+INLINE mat4 mat4_transpose(mat4 m)
 {
     mat4 res;
     for (u32 i = 0; i < 4;++i)
@@ -804,7 +798,7 @@ INLINE mat4 transpose_mat4(mat4 m)
     }
     return res;
 }
-INLINE mat4 mul_mat4f(mat4 m, f32 s)
+INLINE mat4 mat4_mulf(mat4 m, f32 s)
 {
     mat4 res;
     for (u32 i = 0; i < 4; ++i)
@@ -816,7 +810,7 @@ INLINE mat4 mul_mat4f(mat4 m, f32 s)
     }
     return res;
 }
-INLINE vec4 mul_mat4v(mat4 mat, vec4 vec)
+INLINE vec4 mat4_mulv(mat4 mat, vec4 vec)
 {
     vec4 res;
 
@@ -835,16 +829,7 @@ INLINE vec4 mul_mat4v(mat4 mat, vec4 vec)
     return (res);
 }
 
-#ifdef TOOLS_SSE
-INLINE __m128 linear_combine_sse(__m128 l, mat4 r)
-{
-    __m128 res;
-    //some complex shit
-    return (res);
-}
-#endif
-
-INLINE mat4 div_mat4f(mat4 m, f32 s)
+INLINE mat4 mat4_divf(mat4 m, f32 s)
 {
     mat4 res = {0};
     
@@ -861,7 +846,7 @@ INLINE mat4 div_mat4f(mat4 m, f32 s)
     return res;
 }
 
-INLINE mat4 add_mat4(mat4 l, mat4 r)
+INLINE mat4 mat4_add(mat4 l, mat4 r)
 {
     mat4 res;
     for (u32 i = 0; i < 4; ++i)
@@ -875,7 +860,7 @@ INLINE mat4 add_mat4(mat4 l, mat4 r)
 }
 
 
-INLINE mat4 sub_mat4(mat4 l, mat4 r)
+INLINE mat4 mat4_sub(mat4 l, mat4 r)
 {
     mat4 res;
     for (u32 i = 0; i < 4; ++i)
@@ -889,7 +874,7 @@ INLINE mat4 sub_mat4(mat4 l, mat4 r)
 }
 
 //r is done first and then l
-INLINE mat4 mul_mat4(mat4 l, mat4 r)
+INLINE mat4 mat4_mul(mat4 l, mat4 r)
 {
     mat4 res;
     for (u32 col = 0; col < 4; ++col)
@@ -908,7 +893,7 @@ INLINE mat4 mul_mat4(mat4 l, mat4 r)
 }
 
 
-INLINE mat4 translate_mat4(vec3 t) //TODO(ilias): check handedness
+INLINE mat4 mat4_translate(vec3 t) //TODO(ilias): check handedness
 {
     mat4 res = m4d(1.0f);
     res.elements[3][0] = t.x;
@@ -917,11 +902,11 @@ INLINE mat4 translate_mat4(vec3 t) //TODO(ilias): check handedness
     return res;
 }
 
-INLINE mat4 rotate_mat4(float angle, vec3 axis)
+INLINE mat4 mat4_rotate(f32 angle, vec3 axis)
 {
     mat4 res = m4d(1.0f);
 
-    axis = normalize_vec3(axis);
+    axis = vec3_normalize(axis);
 
     float sinA = sin(to_radians(angle));
     float cosA = cos(to_radians(angle));
@@ -942,7 +927,7 @@ INLINE mat4 rotate_mat4(float angle, vec3 axis)
     return (res);
 }
 
-INLINE mat4 scale_mat4(vec3 s)
+INLINE mat4 mat4_scale(vec3 s)
 {
     mat4 res = m4d(1.f);
     res.elements[0][0] *= s.x;
@@ -950,8 +935,8 @@ INLINE mat4 scale_mat4(vec3 s)
     res.elements[2][2] *= s.z;
     return res;
 }
-//what the fuuuuuuuck is this shit??
-INLINE mat4 inv_mat4(mat4 m)
+
+INLINE mat4 mat4_inv(mat4 m)
 {
     mat4 res;
     f32 det;
@@ -1124,9 +1109,9 @@ INLINE mat4 look_at(vec3 eye, vec3 center, vec3 fake_up)
 {
     mat4 res = m4();
 
-    vec3 f = normalize_vec3(sub_vec3(center, eye));
-    vec3 r = normalize_vec3(cross_vec3(f, fake_up));
-    vec3 up = cross_vec3(r, f);
+    vec3 f = vec3_normalize(vec3_sub(center, eye));
+    vec3 r = vec3_normalize(vec3_cross(f, fake_up));
+    vec3 up = vec3_cross(r, f);
 
     res.elements[0][0] = r.x;
     res.elements[0][1] = up.x;
@@ -1143,9 +1128,9 @@ INLINE mat4 look_at(vec3 eye, vec3 center, vec3 fake_up)
     res.elements[2][2] = -f.z;
     res.elements[2][3] = 0.0f;
 
-    res.elements[3][0] = -dot_vec3(r, eye);
-    res.elements[3][1] = -dot_vec3(up, eye);
-    res.elements[3][2] = dot_vec3(f, eye);
+    res.elements[3][0] = -vec3_dot(r, eye);
+    res.elements[3][1] = -vec3_dot(up, eye);
+    res.elements[3][2] = vec3_dot(f, eye);
     res.elements[3][3] = 1.0f;
 
     return res;
@@ -1216,113 +1201,113 @@ maya_to_opengl(mat4 mat)
 #ifdef __cplusplus
 INLINE vec2 operator+(vec2 l, vec2 r)
 {
-    vec2 res = add_vec2(l, r);
+    vec2 res = vec2_add(l, r);
 
     return res;
 }
 INLINE vec2 operator-(vec2 l, vec2 r)
 {
-    vec2 res = sub_vec2(l, r);
+    vec2 res = vec2_sub(l, r);
 
     return res;
 }
 INLINE vec2 operator*(vec2 l, vec2 r)
 {
-    vec2 res = mul_vec2(l, r);
+    vec2 res = vec2_mul(l, r);
 
     return res;
 }
 INLINE vec2 operator*(vec2 l, f32 x)
 {
-    vec2 res = mul_vec2f(l, x);
+    vec2 res = vec2_mulf(l, x);
 
     return res;
 }
 
 INLINE vec2 operator/(vec2 l, vec2 r)
 {
-    vec2 res = div_vec2(l, r);
+    vec2 res = vec2_div(l, r);
 
     return res;
 }
 
 INLINE vec2 operator/(vec2 l,f32 r)
 {
-    vec2 res = div_vec2f(l, r);
+    vec2 res = vec2_divf(l, r);
 
     return res;
 }
 
 INLINE vec3 operator+(vec3 l, vec3 r)
 {
-    vec3 res = add_vec3(l, r);
+    vec3 res = vec3_add(l, r);
 
     return res;
 }
 INLINE vec3 operator-(vec3 l, vec3 r)
 {
-    vec3 res = sub_vec3(l, r);
+    vec3 res = vec3_sub(l, r);
 
     return res;
 }
 INLINE vec3 operator*(vec3 l, vec3 r)
 {
-    vec3 res = mul_vec3(l, r);
+    vec3 res = vec3_mul(l, r);
 
     return res;
 }
 INLINE vec3 operator*(vec3 l, f32 r)
 {
-    vec3 res = mul_vec3f(l, r);
+    vec3 res = vec3_mulf(l, r);
 
     return res;
 }
 INLINE vec3 operator/(vec3 l, vec3 r)
 {
-    vec3 res = div_vec3(l, r);
+    vec3 res = vec3_div(l, r);
 
     return res;
 }
 INLINE vec3 operator/(vec3 l,f32 r)
 {
-    vec3 res = div_vec3f(l, r);
+    vec3 res = vec3_divf(l, r);
 
     return res;
 }
 
 INLINE vec4 operator+(vec4 l, vec4 r)
 {
-    vec4 res = add_vec4(l, r);
+    vec4 res = vec4_add(l, r);
 
     return res;
 }
 INLINE vec4 operator-(vec4 l, vec4 r)
 {
-    vec4 res = sub_vec4(l, r);
+    vec4 res = vec4_sub(l, r);
 
     return res;
 }
 INLINE vec4 operator*(vec4 l, vec4 r)
 {
-    vec4 res = mul_vec4(l, r);
+    vec4 res = vec4_mul(l, r);
 
     return res;
 }
 INLINE vec4 operator*(vec4 l, f32 r)
 {
-    vec4 res = mul_vec4f(l, r);
+    vec4 res = vec4_mulf(l, r);
 
     return res;
 }
 INLINE vec4 operator/(vec4 l, vec4 r)
 {
-    vec4 res = div_vec4(l, r);
+    vec4 res = vec4_div(l, r);
 
     return res;
 }
 INLINE vec4 operator/(vec4 l,f32 r)
 {
-    vec4 res = div_vec4f(l, r);
+    vec4 res = vec4_divf(l, r);
 
     return res;
 }
@@ -1330,27 +1315,27 @@ INLINE vec4 operator/(vec4 l,f32 r)
 
 INLINE mat4 operator+(mat4 l, mat4 r)
 {
-    mat4 res = add_mat4(l,r);
+    mat4 res = mat4_add(l,r);
 
     return res;
 }
 INLINE mat4 operator-(mat4 l, mat4 r)
 {
-    mat4 res = sub_mat4(l,r);
+    mat4 res = mat4_sub(l,r);
 
     return res;
 }
 
 INLINE mat4 operator*(mat4 l, mat4 r)
 {
-    mat4 res = mul_mat4(l,r);
+    mat4 res = mat4_mul(l,r);
 
     return res;
 }
 
 INLINE mat4 operator*(mat4 l,f32 r)
 {
-    mat4 res = mul_mat4f(l,r);
+    mat4 res = mat4_mulf(l,r);
 
     return res;
 }
@@ -1503,11 +1488,11 @@ INLINE Quaternion quat_from_angle(vec3 axis, f32 angle)
 {
     Quaternion res;
 
-    vec3 axis_normalized = normalize_vec3(axis);
+    vec3 axis_normalized = vec3_normalize(axis);
     //this because quaternions are (i)q(i^-1) so angles are double
     f32 sintheta = sin(angle / 2.f); 
 
-    res.xyz = mul_vec3f(axis_normalized, sintheta);
+    res.xyz = vec3_mulf(axis_normalized, sintheta);
     res.w = cos(angle / 2.f);
     
     return res;

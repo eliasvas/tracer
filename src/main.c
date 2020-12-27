@@ -1,4 +1,5 @@
 #include "tools.h"
+#include "ray.h"
 
 static u32 window_width = 640;
 static u32 window_height= 360;
