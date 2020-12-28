@@ -3,11 +3,13 @@
 #include "tools.h"
 #include "ray.h"
 
+typedef struct Material Material;
 typedef struct HitRecord
 {
   f32 t;
   vec3 p;
   vec3 normal;
+  Material *m;
 }HitRecord;
 
 typedef enum HitableType
@@ -58,12 +60,14 @@ typedef struct Hitable
   {
     Sphere s;
   };
+  Material *m;
   HitableType type;  
 }Hitable;
 
 static i32 
 hitable_hit(Hitable *hitable, Ray r, f32 t_min, f32 t_max, HitRecord * rec)
 {
+  rec->m = hitable->m;
   if (hitable->type == SPHERE)
     return sphere_hit(hitable->s, r, t_min, t_max, rec);
   return 0;
