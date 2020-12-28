@@ -190,8 +190,8 @@ random01(void)
 {
     //seed_random();
     f32 r = (f32)rand();
-	r /= RAND_MAX;
-	return r;
+    r /= RAND_MAX;
+    return r;
 }
 
 INLINE f32 

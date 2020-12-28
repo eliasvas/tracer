@@ -1,9 +1,11 @@
 #include "tools.h"
 #include "ray.h"
 #include "hitable.h"
+#include "camera.h"
 
 static u32 window_width = 800;
 static u32 window_height= 400;
+static u32 SAMPLES_PER_PIXEL = 8;
 
 static vec3 color(Ray r, HitableList *world)
 {
@@ -27,6 +29,7 @@ main(void)
   vec3 horizontal = v3(4.f,0.f,0.f);
   vec3 vertical = v3(0.f,2.f,0.f);
   vec3 origin = v3(0.f,0.f,0.f);
+  Camera cam = (Camera){origin, lower_left_corner, horizontal, vertical};
   Hitable *list[2];
   list[0] = ALLOC(sizeof(Hitable));
   list[0]->type = SPHERE;
@@ -42,10 +45,16 @@ main(void)
   {
       u32 x = i % window_width;
       u32 y = i / window_width;
-      f32 u = x / (f32)window_width;
-      f32 v = y / (f32)window_height;
-      Ray r = ray_init(origin, vec3_add(lower_left_corner, vec3_add(vec3_mulf(horizontal, u), vec3_mulf(vertical, v))));
-      vec3 col = color(r, &hlist);
+      vec3 col = v3(0,0,0);
+      for (i32 sample = 0; sample < SAMPLES_PER_PIXEL; ++sample)
+      {
+        f32 u = (x + random01()) / (f32)window_width;
+        f32 v = (y + random01()) / (f32)window_height;
+        Ray r = get_ray(&cam, u, v);
+        vec3 p = ray_point_at(r, 2.f);
+        col = vec3_add(col, color(r,&hlist));
+      }
+      col = vec3_divf(col, SAMPLES_PER_PIXEL);
       pixels[3*i] = col.x;
       pixels[3*i+1] = col.y;
       pixels[3*i+2] = col.z;
