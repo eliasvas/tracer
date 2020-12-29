@@ -17,6 +17,7 @@ typedef enum MaterialType
 {
   LAMBERTIAN = 1,
   METAL = 2,
+  DIELECTRIC = 3,
 }MaterialType;
 
 typedef struct LambertianMaterial
@@ -51,13 +52,61 @@ static i32 metal_scatter(MetalMaterial *m, Ray r, HitRecord *rec, vec3 *attenuat
   *attenuation = m->albedo;
   return (vec3_dot(scattered->d, rec->normal) > 0);
 }
+static i32 refract(vec3 v, vec3 n, f32 ni_over_nt, vec3* refracted)
+{
+  vec3 uv = vec3_normalize(v);
+  f32 dt = vec3_dot(uv,n);
+  f32 d = 1.f - ni_over_nt * (1.f - dt*dt);
+  if (d >0)
+  {
+    *refracted = vec3_sub(vec3_mulf(vec3_sub(uv, vec3_mulf(n,dt)), ni_over_nt), vec3_mulf(n,sqrt(d)));
+    return 1;
+  }
+  return 0;
+}
 
+
+typedef struct DielectricMaterial
+{
+  f32 ref_index;
+}DielectricMaterial;
+
+static i32 dielectric_scatter(DielectricMaterial *m, Ray r, HitRecord *rec, vec3 *attenuation, Ray *scattered)
+{
+  vec3 outward_normal;
+  vec3 reflected = vec3_reflect(r.d, rec->normal);
+  f32 ni_over_nt;
+  *attenuation = v3(1.f,1.f,1.f);
+  vec3 refracted;
+  if (vec3_dot(r.d,rec->normal) > 0)
+  {
+    outward_normal = vec3_mulf(rec->normal, -1.f);
+    ni_over_nt = m->ref_index;
+  }
+  else
+  {
+    outward_normal = rec->normal;
+    ni_over_nt = 1.f / m->ref_index;
+  }
+
+  if (refract(r.d, outward_normal, ni_over_nt, &refracted))
+  {
+    *scattered = ray_init(rec->p, refracted);
+  }
+  else 
+  {
+      *scattered = ray_init(rec->p, reflected);
+      return 0;
+  }
+  return 1;
+}
 typedef struct Material
 {
   union
   {
     LambertianMaterial lm;
     MetalMaterial mm;
+    DielectricMaterial dm;
   };
   MaterialType type;
 }Material;
@@ -68,6 +117,8 @@ static i32 scatter(Material *m,Ray r, HitRecord *rec,vec3 *attenuation,Ray* scat
     return lambertian_scatter(&m->lm,r, rec, attenuation, scattered);
   else if (m->type == METAL)
     return metal_scatter(&m->mm,r, rec, attenuation, scattered);
+  else if (m->type == DIELECTRIC)
+    return dielectric_scatter(&m->dm,r, rec, attenuation, scattered);
   return 0; 
     
 }

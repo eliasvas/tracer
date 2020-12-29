@@ -30,11 +30,8 @@ main(void)
 {
   f32 *pixels = ALLOC(sizeof(f32) * window_width * window_height * 3);
   seed_random();
-  vec3 lower_left_corner = v3(-2.f, -1.f, -1.f);
-  vec3 horizontal = v3(4.f,0.f,0.f);
-  vec3 vertical = v3(0.f,2.f,0.f);
-  vec3 origin = v3(0.f,0.f,0.f);
-  Camera cam = (Camera){origin, lower_left_corner, horizontal, vertical};
+  //Camera cam = camera_init(90.f, window_width / (f32)window_height);
+  Camera cam = camera_lookat(v3(2,2,1),v3(0,0,-1), v3(0,1,0), 45.f, window_width / (f32)window_height, 0,1);
   Hitable *list[4];
   list[0] = ALLOC(sizeof(Hitable));
   list[0]->type = SPHERE;
@@ -47,19 +44,19 @@ main(void)
   list[1]->s = (Sphere){v3(0,-100.5f,-1.f), 100.f};
   list[1]->m = ALLOC(sizeof(Material));
   list[1]->m->type = LAMBERTIAN;
-  list[1]->m->lm = (LambertianMaterial){v3(0.5f,0.5f,0.5f)};
+  list[1]->m->lm = (LambertianMaterial){v3(0.3f,0.5f,0.f)};
   list[2] = ALLOC(sizeof(Hitable));
   list[2]->type = SPHERE;
   list[2]->s = (Sphere){v3(1.f,0,-1), 0.5f};
   list[2]->m = ALLOC(sizeof(Material));
   list[2]->m->type = METAL;
-  list[2]->m->mm = (MetalMaterial){v3(0.2f,0.2f,0.2f), 0.1f};
+  list[2]->m->mm = (MetalMaterial){v3(0.9f,0.8f,0.8f), 0.1f};
   list[3] = ALLOC(sizeof(Hitable));
   list[3]->type = SPHERE;
   list[3]->s = (Sphere){v3(-1.f,0,-1), 0.5f};
   list[3]->m = ALLOC(sizeof(Material));
-  list[3]->m->type = METAL;
-  list[3]->m->mm = (MetalMaterial){v3(0.9f,0.8f,0.8f),0.f};
+  list[3]->m->type = DIELECTRIC;
+  list[3]->m->dm = (DielectricMaterial){1.5f};
 
 
   HitableList hlist;
