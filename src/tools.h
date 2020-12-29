@@ -31,8 +31,12 @@ typedef double    f64;
 typedef int32_t   b32;
 typedef char      b8;
 
+#if !defined(internal)
+#define internal static
+#endif
+#define local_persist static
+#define global static
 #define INLINE static inline
-#define INTERNAL static
 
 #define kilobytes(val) ((val)*1024LL)
 #define megabytes(val) ((kilobytes(val))*1024LL)

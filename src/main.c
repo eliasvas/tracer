@@ -15,7 +15,7 @@ static vec3 color(Ray r, HitableList *world, i32 depth)
   {
     Ray scattered;
     vec3 attenuation;
-    if (depth <5 && scatter(rec.m,r, &rec, &attenuation, &scattered))
+    if (depth <10 && scatter(rec.m,r, &rec, &attenuation, &scattered))
       return vec3_mul(attenuation, color(scattered, world, depth+1));
     else
       return v3(0,0,0);
@@ -30,9 +30,9 @@ main(void)
 {
   f32 *pixels = ALLOC(sizeof(f32) * window_width * window_height * 3);
   seed_random();
-  //Camera cam = camera_init(90.f, window_width / (f32)window_height);
   Camera cam = camera_lookat(v3(2,2,1),v3(0,0,-1), v3(0,1,0), 45.f, window_width / (f32)window_height, 0,1);
-  Hitable *list[4];
+  //Camera cam = camera_lookat(v3(0,0,0),v3(0,0,-1), v3(0,1,0), 90.f, window_width / (f32)window_height, 0,1);
+  Hitable *list[5];
   list[0] = ALLOC(sizeof(Hitable));
   list[0]->type = SPHERE;
   list[0]->s = (Sphere){v3(0,0,-1), 0.5f};
@@ -57,6 +57,13 @@ main(void)
   list[3]->m = ALLOC(sizeof(Material));
   list[3]->m->type = DIELECTRIC;
   list[3]->m->dm = (DielectricMaterial){1.5f};
+  list[4] = ALLOC(sizeof(Hitable));
+  list[4]->type = TRIANGLE;
+  list[4]->t = (Triangle){v3(4,4,-1), v3(0,4,-1),v3(4,0,-1)};
+  list[4]->m = ALLOC(sizeof(Material));
+  list[4]->m->type = LAMBERTIAN;
+  list[4]->m->lm = (LambertianMaterial){v3(0.2f,0.2f,0.9f)};
+
 
 
   HitableList hlist;
