@@ -23,7 +23,7 @@ typedef struct Sphere
   f32 radius;
 }Sphere;
 
-static i32 
+internal i32 
 sphere_hit(Sphere s, Ray r, f32 t_min, f32 t_max, HitRecord *rec)
 {
   vec3 oc = vec3_sub(r.o, s.center);
@@ -60,7 +60,7 @@ typedef struct Triangle
   vec3 v2;
 }Triangle;
 
-static i32 
+internal i32 
 triangle_hit(Triangle tri, Ray r, f32 t_min, f32 t_max, HitRecord *rec)
 {
   //first we compute the planes (triangles) normal vector
@@ -122,14 +122,15 @@ typedef struct Hitable
   HitableType type;  
 }Hitable;
 
-static i32 
+internal i32 
 hitable_hit(Hitable *hitable, Ray r, f32 t_min, f32 t_max, HitRecord * rec)
 {
   rec->m = hitable->m;
-  if (hitable->type == SPHERE)
-    return sphere_hit(hitable->s, r, t_min, t_max, rec);
-  else if (hitable->type == TRIANGLE)
-    return triangle_hit(hitable->t, r, t_min, t_max, rec);
+    if (hitable->type == TRIANGLE)
+        return triangle_hit(hitable->t, r, t_min, t_max, rec);
+    else if (hitable->type == SPHERE)
+        return sphere_hit(hitable->s, r, t_min, t_max, rec);
+
   return 0;
 }
 
@@ -139,7 +140,7 @@ typedef struct HitableList
   u32 list_size;
 }HitableList;
 
-static i32 
+internal i32 
 hitable_list_hit(HitableList *hl, Ray r, f32 t_min, f32 t_max, HitRecord *rec)
 {
   HitRecord temp_rec;

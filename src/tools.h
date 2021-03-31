@@ -172,41 +172,26 @@ find_char_in_string(char *string,i32 start_index, char tofind)
     return iter;
 }
 
-static void
-seed_random()
+internal u32 next_random = 1;
+void seed_random(u32 seed)
 {
-    srand((u32)time(0));
+    next_random = seed;
 }
-
-//random between [-1,1]
-INLINE f32
-random(void)
+u32 random(void)
 {
-    //seed_random();
-    f32 r = (f32)rand();
-	r /= RAND_MAX;
-	r = 2.0f * r - 1.0f;
-	return r;
+    next_random = next_random * 1104859651 + 83497;
+    return (u32)(next_random / 65536) % 32768;
 }
 
 INLINE f32
 random01(void)
 {
     //seed_random();
-    f32 r = (f32)rand();
+    f32 r = (f32)random();
     r /= RAND_MAX;
     return r;
 }
 
-INLINE f32 
-rrandom(f32 lo, f32 hi)
-{
-    //seed_random();
-	f32 r = (f32)rand();
-	r /= RAND_MAX;
-	r = (hi - lo) * r + lo;
-	return r;
-}
 
 
 //NOTE(ilias): maybe make a free_file because our game leaks :(
