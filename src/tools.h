@@ -2007,8 +2007,8 @@ ppm_write(PPMInfo* info, const char *filename)
     return PPM_OK;
 }
 
-static i32
-ppm_write01(PPMInfo* info, const char *filename)
+internal i32
+ppm_write01(PPMInfo* info, char *filename)
 {
     //flip_image_horizontally(info->width, info->height, info->image_data);
     FILE* file;
@@ -2029,8 +2029,8 @@ ppm_write01(PPMInfo* info, const char *filename)
     fprintf(file, "%d\n", info->width);
     fprintf(file, "%d\n", info->height);
     fprintf(file, "%d\n", info->max_color);
-    int j;
-    int i;
+    i32 j;
+    i32 i;
     for (j = info->height-1; j >=0; --j)
     {
         for (i = 0; i < info->width; ++i)

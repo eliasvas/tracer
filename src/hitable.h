@@ -123,15 +123,15 @@ typedef struct Hitable
 }Hitable;
 
 internal i32 
-hitable_hit(Hitable *hitable, Ray r, f32 t_min, f32 t_max, HitRecord * rec)
+hitable_hit(Hitable *hitable, Ray r, f32 t_min, f32 t_max, HitRecord *rec)
 {
-  rec->m = hitable->m;
+    rec->m = hitable->m;
     if (hitable->type == TRIANGLE)
         return triangle_hit(hitable->t, r, t_min, t_max, rec);
     else if (hitable->type == SPHERE)
         return sphere_hit(hitable->s, r, t_min, t_max, rec);
 
-  return 0;
+    return 0;
 }
 
 typedef struct HitableList

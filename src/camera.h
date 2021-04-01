@@ -14,7 +14,8 @@ typedef struct Camera
 
 
 
-static vec3 random_in_unit_disk(void)
+//this function is sad :(( (fix me)
+internal vec3 random_in_unit_disk(void)
 {
   vec3 p;
   do
@@ -24,29 +25,30 @@ static vec3 random_in_unit_disk(void)
   return p;
 
 }
-static Ray 
+internal Ray 
 get_ray(Camera *c, f32 u, f32 v)
 {
   vec3 rd = vec3_mulf(random_in_unit_disk(), c->lens_radius);
   vec3 offset = vec3_add(vec3_mulf(c->u,rd.x), vec3_mulf(c->v,rd.y));
   return ray_init(vec3_add(c->origin, offset), vec3_sub(vec3_sub(vec3_add(c->lower_left_corner, vec3_add(vec3_mulf(c->horizontal, u), vec3_mulf(c->vertical, v))), c->origin),offset)); 
 }
-static Camera 
+internal Camera 
 camera_lookat(vec3 lookfrom, vec3 lookat, vec3 vup, f32 vfov, f32 aspect, f32 aperture, f32 focus_dist)
 {
   Camera cam;
   vec3 u,v,w;
 
-  cam.lens_radius = aperture / 2.f;
+  cam.lens_radius = aperture/2.f;
   f32 theta = vfov * PI/180.f;
-  //this is so because tan = sin/cos => tan = half_height / camera_distance = half_height (take y-z view and compute)
+  //this is so because tan = opposite/adjacent  => tan = half_height / forward(1) = half_height (take y-z view of camera and compute)
   f32 half_height = tan(theta / 2.f);
+  //because aspect = ww/wh
   f32 half_width = aspect * half_height;
   cam.origin = lookfrom;
   cam.w = vec3_normalize(vec3_sub(lookfrom, lookat));
   cam.u = vec3_normalize(vec3_cross(vup, cam.w));
   cam.v = vec3_cross(cam.w,cam.u);
-  //lower_left_corner = v3(-half_width, -half_height,-1.f);
+  //llc = origin - u * ww/2 + v * wh/2 + forward
   cam.lower_left_corner = vec3_add(vec3_add(cam.origin, vec3_mulf(cam.u, -half_width * focus_dist)),vec3_add(vec3_mulf(cam.v, -half_height * focus_dist), vec3_mulf(cam.w, -1.f * focus_dist)));
   cam.horizontal = vec3_mulf(cam.u, 2 * half_width * focus_dist);
   cam.vertical = vec3_mulf(cam.v, 2 * half_height * focus_dist);

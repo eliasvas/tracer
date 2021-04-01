@@ -32,10 +32,10 @@ internal vec3 color(Ray r, HitableList *world, i32 depth)
 internal i32 
 main(void)
 {
-  f32 *pixels = ALLOC(sizeof(f32) * window_width * window_height * 3);
+  vec3 *framebuffer = ALLOC(sizeof(vec3) * window_width * window_height);
   seed_random(23848);
   Camera cam = camera_lookat(v3(2,2,1),v3(0,0,-1), v3(0,1,0), 45.f, window_width / (f32)window_height, 0,1);
-  //Camera cam = camera_lookat(v3(0,0,0),v3(0,0,-1), v3(0,1,0), 90.f, window_width / (f32)window_height, 0,1);
+  //Camera cam = camera_lookat(v3(0,0,-3),v3(0,0,-1), v3(0,1,0), 90.f, window_width / (f32)window_height, 0,1);
   Hitable *list[5];
   list[0] = ALLOC(sizeof(Hitable));
   list[0]->type = TRIANGLE;
@@ -90,11 +90,9 @@ main(void)
       col = vec3_divf(col, SAMPLES_PER_PIXEL);
       //apply gamma correction
       col = v3(sqrt(col.x),sqrt(col.y),sqrt(col.z));
-      pixels[3*i] = col.x;
-      pixels[3*i+1] = col.y;
-      pixels[3*i+2] = col.z;
+      framebuffer[i] = v3(col.x,col.y,col.z);
   }
   printf("writing to disk\n");
-  ppm_save_pixels(window_width, window_height, pixels);
+  ppm_save_pixels(window_width, window_height, (f32*)framebuffer);
   printf("finished\n");
 }
