@@ -28,7 +28,7 @@ typedef struct LambertianMaterial
 internal i32 lambertian_scatter(LambertianMaterial *m, Ray r, HitRecord *rec, vec3 *attenuation, Ray *scattered)
 {
   vec3 target = vec3_add(rec->p, vec3_add(rec->normal, random_in_unit_sphere())); 
-  *scattered = ray_init(rec->p, vec3_sub(target, rec->p));
+  *scattered = ray_init(rec->p, vec3_sub(target, rec->p), RAY_REFLECTION);
   *attenuation = m->albedo;
   return 1;
 }
@@ -48,7 +48,7 @@ internal vec3 vec3_reflect(vec3 v, vec3 n)
 internal i32 metal_scatter(MetalMaterial *m, Ray r, HitRecord *rec, vec3 *attenuation, Ray *scattered)
 {
   vec3 reflected = vec3_reflect(vec3_normalize(r.d),rec->normal); 
-  *scattered = ray_init(rec->p, vec3_add(reflected, vec3_mulf(random_in_unit_sphere(),m->fuzz)));
+  *scattered = ray_init(rec->p, vec3_add(reflected, vec3_mulf(random_in_unit_sphere(),m->fuzz)), RAY_REFLECTION);
   *attenuation = m->albedo;
   return (vec3_dot(scattered->d, rec->normal) > 0);
 }
@@ -59,7 +59,7 @@ internal i32 refract(vec3 v, vec3 n, f32 ni_over_nt, vec3* refracted)
   f32 d = 1.f - ni_over_nt * (1.f - dt*dt);
   if (d >0)
   {
-    *refracted = vec3_sub(vec3_mulf(vec3_sub(uv, vec3_mulf(n,dt)), ni_over_nt), vec3_mulf(n,sqrt(d)));
+    *refracted = vec3_sub(vec3_mulf(vec3_sub(uv, vec3_mulf(n,dt)), ni_over_nt), vec3_mulf(n,sqrt(d)), RAY_REFRACTION);
     return 1;
   }
   return 0;
@@ -91,11 +91,11 @@ internal i32 dielectric_scatter(DielectricMaterial *m, Ray r, HitRecord *rec, ve
 
   if (refract(r.d, outward_normal, ni_over_nt, &refracted))
   {
-    *scattered = ray_init(rec->p, refracted);
+    *scattered = ray_init(rec->p, refracted, RAY_REFRACTION);
   }
   else 
   {
-      *scattered = ray_init(rec->p, reflected);
+      *scattered = ray_init(rec->p, reflected, RAY_REFLECTION);
       return 0;
   }
   return 1;

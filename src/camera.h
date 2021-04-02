@@ -30,7 +30,7 @@ get_ray(Camera *c, f32 u, f32 v)
 {
   vec3 rd = vec3_mulf(random_in_unit_disk(), c->lens_radius);
   vec3 offset = vec3_add(vec3_mulf(c->u,rd.x), vec3_mulf(c->v,rd.y));
-  return ray_init(vec3_add(c->origin, offset), vec3_sub(vec3_sub(vec3_add(c->lower_left_corner, vec3_add(vec3_mulf(c->horizontal, u), vec3_mulf(c->vertical, v))), c->origin),offset)); 
+  return ray_init(vec3_add(c->origin, offset), vec3_sub(vec3_sub(vec3_add(c->lower_left_corner, vec3_add(vec3_mulf(c->horizontal, u), vec3_mulf(c->vertical, v))), c->origin),offset), RAY_PRIMARY); 
 }
 internal Camera 
 camera_lookat(vec3 lookfrom, vec3 lookat, vec3 vup, f32 vfov, f32 aspect, f32 aperture, f32 focus_dist)

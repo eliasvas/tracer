@@ -137,17 +137,17 @@ INLINE b32 is_pow2(u32 val)
     b32 res = ((val & ~(val - 1)) == val);
     return(res);
 }
-static b32
+INLINE b32
 char_is_alpha(i32 c)
 {
     return ((c >='A' && c <= 'z') || (c >= 'a' && c <= 'z'));
 }
-static b32 char_is_digit(i32 c)
+INLINE b32 char_is_digit(i32 c)
 {
     return c >= '0'&& c <= '9';
 }
 
-static i32 char_to_lower(i32 c)
+INLINE i32 char_to_lower(i32 c)
 {
     if (c >= 'A' && c <= 'z')
     {
@@ -156,20 +156,12 @@ static i32 char_to_lower(i32 c)
     return c;
 }
 
-static u32 
+INLINE u32 
 str_size(char* str)
 {
     u32 i = 0;
     while (str[i] != 0)++i;
     return i;
-}
-
-static u32
-find_char_in_string(char *string,i32 start_index, char tofind)
-{
-    i32 iter = start_index;
-    while (string[iter] != '\0' && string[iter] != tofind) iter++;
-    return iter;
 }
 
 internal u32 next_random = 1;
@@ -192,67 +184,6 @@ random01(void)
     return r;
 }
 
-
-
-//NOTE(ilias): maybe make a free_file because our game leaks :(
-INLINE char * 
-read_whole_file(const char *filename)
-{
-    FILE *f = fopen(filename, "rb");
-    fseek(f, 0, SEEK_END);
-    long fsize = ftell(f);
-    fseek(f, 0, SEEK_SET);  /* same as rewind(f); */
-
-    char *string = (char*)ALLOC(fsize + 1);
-    fread(string, 1, fsize, f);
-    fclose(f);
-
-    string[fsize] = 0; 
-
-    return (char*)string;
-}
-INLINE u32
-get_file_size(const char *filename)
-{
-    FILE *f = fopen(filename, "rb");
-    if (!f)return 0;
-    fseek(f, 0, SEEK_END);
-    u32 fsize = ftell(f);
-    return fsize;
-}
-
-INLINE b32 
-file_exists(char* filename) {
-  b32 ret;
-  FILE* fp = fopen(filename, "rb");
-  if (fp) {
-    ret = 1;
-    fclose(fp);
-  } else {
-    ret = 0;
-  }
-
-  return ret;
-}
-
-static i32 
-get_num_from_string(char *str)
-{
-   char num[64];
-   int k = 0;
-   i32 i = 0;
-   while (str[i] != '\0')
-   {
-      if (char_is_digit(str[i]))
-      {
-          num[k++] = str[i];
-      }else if (k > 0)break; //we only get the first number in the string
-      ++i;
-   }
-   num[k] = '\0';
-   i32 res = atoi(num);
-   return res;
-}
 
 //MATH LIB
 typedef union vec2
@@ -1606,214 +1537,7 @@ mat4_to_quat(mat4 m)
 }
 
 
-//TGA LIB 
-enum {
-    TGA_ERROR_FILE_OPEN = 1,
-    TGA_ERROR_READING_FILE,
-    TGA_ERROR_INDEXED_COLOR, 
-    TGA_ERROR_MEMORY,
-    TGA_ERROR_COMPRESSED_FILE, 
-    TGA_OK
-};
-
-typedef struct TGAInfo
-{
-    i32 status;
-    u8 type, pixel_depth;
-    i16 width, height;
-    u8 *image_data;
-}TGAInfo;
-
-static TGAInfo* tga_init_image_RGB(i16 width, i16 height)
-{
-    TGAInfo* info;
-    info = (TGAInfo*)ALLOC(sizeof(TGAInfo));
-    info->width = width;
-    info->height = height;
-    info->pixel_depth = 24;
-    info->type = 2; 
-    info->status = TGA_OK;
-    info->image_data = (u8*)ALLOC(sizeof(u8) * width * height * (info->pixel_depth / 8));
-    return info;
-}
-
-static void 
-tga_load_header(FILE *file, TGAInfo *info) {
-
-	u8 c_garbage;
-	i16 i_garbage;
-
-	fread(&c_garbage, sizeof(u8), 1, file);
-	fread(&c_garbage, sizeof(u8), 1, file);
-
-    // type must be 2 or 3
-	fread(&info->type, sizeof(u8), 1, file);
-
-	fread(&i_garbage, sizeof(i16), 1, file);
-	fread(&i_garbage, sizeof(i16), 1, file);
-	fread(&c_garbage, sizeof(u8), 1, file);
-	fread(&i_garbage, sizeof(i16), 1, file);
-	fread(&i_garbage, sizeof(i16), 1, file);
-
-	fread(&info->width, sizeof(i16), 1, file);
-	fread(&info->height, sizeof(i16), 1, file);
-	fread(&info->pixel_depth, sizeof(u8), 1, file);
-
-	fread(&c_garbage, sizeof(u8), 1, file);
-}
-static void tga_load_image_data(FILE *file, TGAInfo *info) {
-
-	i32 mode,total,i;
-	u8 aux;
-
-    // mode equal the number of components for each pixel
-	mode = info->pixel_depth / 8;
-    // total is the number of bytes we'll have to read
-	total = info->height * info->width * mode;
-	
-	fread(info->image_data,sizeof(u8),total,file);
-
-    // mode=3 or 4 implies that the image is RGB(A). However TGA
-    // stores it as BGR(A) so we'll have to swap R and B.
-	if (mode >= 3)
-		for (i=0; i < total; i+= mode) {
-			aux = info->image_data[i];
-			info->image_data[i] = info->image_data[i+2];
-			info->image_data[i+2] = aux;
-		}
-}
-
-static TGAInfo* 
-tga_load(const char * filename)
-{
-    TGAInfo *info;
-    FILE* file;
-    i32 mode,total;
-
-    //allocate memory for TGAInfo
-    info = (TGAInfo*)ALLOC(sizeof(TGAInfo));
-    if(info == NULL)return(NULL);
-
-    //open file for binary reading
-    file = fopen(filename, "rb");
-    if (file == NULL)
-    {
-        info->status = TGA_ERROR_FILE_OPEN;
-        //fclose(file);
-        return info;
-    }
-
-    //we load the header and fill out neccesary info
-    tga_load_header(file, info);
-
-    //check if color indexed
-    if (info->type == 1)
-    {
-        info->status = TGA_ERROR_INDEXED_COLOR;
-        fclose(file);
-        return info;
-    }
-
-    //check if compressed
-    if ((info->type != 2) && (info->type != 3))
-    {
-       info->status = TGA_ERROR_COMPRESSED_FILE; 
-    }
-
-    mode = info->pixel_depth / 8;
-    total =info->height * info->width * mode;
-    info->image_data = (u8*)ALLOC(total * sizeof(u8));
-
-    //check if memory is ok
-    if (info->image_data == NULL)
-    {
-        info->status = TGA_ERROR_MEMORY;
-        fclose(file);
-        return info;
-    }
-
-    //load the fucking image
-    tga_load_image_data(file, info);
-    if (ferror(file))
-    {
-        info->status = TGA_ERROR_READING_FILE;
-        fclose(file);
-        info->status = TGA_OK;
-        return info;
-    }
-    fclose(file);
-    info->status = TGA_OK;
-
-    return info;
-}
-
-
-static i16 
-tga_save(const char *filename, i16 width, i16 height, u8 pixel_depth, u8 *image_data)
-{
-    u8 c_garbage = 0, type,mode, aux;
-    i16 i_garbage;
-    i32 i;
-    FILE* file;
-    file = fopen(filename, "wb");
-    if (file == NULL)
-        return TGA_ERROR_FILE_OPEN;
-    mode = pixel_depth / 8;
-    if ((pixel_depth == 24) || (pixel_depth == 32))
-        type = 2;
-    else
-        type = 3;
-
-    // write the header
-	fwrite(&c_garbage, sizeof(u8), 1, file);
-	fwrite(&c_garbage, sizeof(u8), 1, file);
-
-	fwrite(&type, sizeof(u8), 1, file);
-
-	fwrite(&i_garbage, sizeof(i16), 1, file);
-	fwrite(&i_garbage, sizeof(i16), 1, file);
-	fwrite(&c_garbage, sizeof(u8), 1, file);
-	fwrite(&i_garbage, sizeof(i16), 1, file);
-	fwrite(&i_garbage, sizeof(i16), 1, file);
-
-	fwrite(&width, sizeof(i16), 1, file);
-	fwrite(&height, sizeof(i16), 1, file);
-	fwrite(&pixel_depth, sizeof(u8), 1, file);
-
-	fwrite(&c_garbage, sizeof(u8), 1, file);
-
-
-    // convert the image data from RGB(a) to BGR(A)
-	if (mode >= 3)
-        for (i=0; i < width * height * mode ; i+= mode) {
-            aux = image_data[i];
-            image_data[i] = image_data[i+2];
-            image_data[i+2] = aux;
-        }
-
-    // save the image data
-	fwrite(image_data, sizeof(u8), width * height * mode, file);
-	fclose(file);
-	//free(image_data);
-    //image_data = NULL;
-
-	return TGA_OK;
-}
-
-static void
-tga_destroy(TGAInfo * info)
-{
-    if (info != NULL)
-    {
-        if (info->image_data != NULL)
-            free(info->image_data);
-        free(info);
-    }
-    
-}
-
 //PPM LIB
-
 typedef struct PPMInfo
 {
     i32 status;
@@ -2051,7 +1775,7 @@ ppm_write01(PPMInfo* info, char *filename)
     return PPM_OK;
 }
 
-static i32 ppm_save_pixels(i32 width, i32 height, f32* pixels)
+internal i32 ppm_save_pixels(i32 width, i32 height, f32* pixels)
 {
     PPMInfo *info = ppm_init(width,height);
     i32 i;
@@ -2068,6 +1792,54 @@ static i32 ppm_save_pixels(i32 width, i32 height, f32* pixels)
         free(pixels);
     }
 */
+
+internal void ITOA(u32 num, char *buffer)
+{
+
+}
+
+internal i32
+ppm_write_ez(i32 window_width, i32 window_height, f32 *pixels, char *filename)
+{
+    char *buf = ALLOC(sizeof(char) * sizeof(pixels) * 3 * 3 * 2);
+    char number[] = {'6','6','6'};
+    u32 offset = 0;
+    buf[offset++] = 'P';
+    buf[offset++] = '3';
+    buf[offset++] = ' ';
+    memcpy((char*)(buf+offset), number, sizeof(char) * 3);
+    offset+=3;
+
+    /*
+    fputc(info->type[0], file);
+    fputc(info->type[1], file);
+    fputc('\n', file);
+    fprintf(file, "%d\n", info->width);
+    fprintf(file, "%d\n", info->height);
+    fprintf(file, "%d\n", info->max_color);
+    i32 j;
+    i32 i;
+    for (j = info->height-1; j >=0; --j)
+    {
+        for (i = 0; i < info->width; ++i)
+        {
+            int index = info->width * 3 *j + 3 * i;
+            i32 cmp[3];
+            cmp[0]= (i32)(info->image_data[index] * info->max_color);
+            cmp[1]= (i32)(info->image_data[index+1] * info->max_color);
+            cmp[2]= (i32)(info->image_data[index+2] * info->max_color);
+            fprintf(file, "%d ", cmp[0]);
+            fprintf(file, "%d ", cmp[1]);
+            fprintf(file, "%d", cmp[2]);
+            fputc('\n', file);
+
+        }
+    }
+    */
+
+    return PPM_OK;
+}
+
 
 //TODO: make a ppm_write_FBO to write color attachments of a framebuffer as PPM images.. 
 
@@ -2092,13 +1864,13 @@ arena_init(void* memory, u32 size)
     return a;
 }
 
-static void
+internal void
 arena_free(Arena* arena, u32 size)
 {
     //do nothing
 }
 
-static void * 
+internal void * 
 arena_alloc(Arena* arena, u32 size)
 {
     void* mem = 0;
@@ -2113,13 +1885,13 @@ arena_alloc(Arena* arena, u32 size)
     return mem;
 }
 
-static void
+internal void
 arena_clear(Arena* arena)
 {
     arena->current_offset = 0;
 }
 
-static void 
+internal void 
 arena_zero(Arena* arena)
 {
     memset(arena->memory, 0, arena->memory_size);
@@ -2202,7 +1974,7 @@ typedef struct BufHdr
 #define buf_push(b, ...) (buf_fit((b), 1 + buf_len(b)), (b)[buf__hdr(b)->len++] = (__VA_ARGS__))
 #define buf_free(b) ((b) ? (free(buf__hdr(b)), (b) = NULL) : 0)
 
-static void *buf__grow(const void *buf, u32 new_len, u32 element_size)
+internal void *buf__grow(const void *buf, u32 new_len, u32 element_size)
 {
    u32 new_cap = max(16, max(1 + 2*buf_cap(buf), new_len));
    assert(new_len <= new_cap);
@@ -2239,22 +2011,6 @@ static void *buf__grow(const void *buf, u32 new_len, u32 element_size)
         buf_free(arr);
 }
 */
-typedef struct Vertex
-{
-   vec3 position; 
-   vec3 normal;
-   vec2 tex_coord;
-}Vertex;
-
-static Vertex vert(vec3 p, vec3 n, vec2 t)
-{
-    Vertex res;
-    res.position = p;
-    res.normal = n;
-    res.tex_coord = t;
-    return res;
-}
-
 
 
 

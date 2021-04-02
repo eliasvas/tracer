@@ -19,7 +19,7 @@ internal vec3 color(Ray r, HitableList *world, i32 depth)
   {
     Ray scattered;
     vec3 attenuation;
-    if (depth <10 && scatter(rec.m,r, &rec, &attenuation, &scattered))
+    if (depth <5 && scatter(rec.m,r, &rec, &attenuation, &scattered))
       return vec3_mul(attenuation, color(scattered, world, depth+1));
     else
       return v3(0,0,0);
@@ -34,12 +34,13 @@ main(void)
 {
   vec3 *framebuffer = ALLOC(sizeof(vec3) * window_width * window_height);
   seed_random(23848);
-  Camera cam = camera_lookat(v3(2,2,1),v3(0,0,-1), v3(0,1,0), 45.f, window_width / (f32)window_height, 0,1);
+  Camera cam = camera_lookat(v3(5,5,1),v3(0,0,-1), v3(0,1,0), 45.f, window_width / (f32)window_height, 0,1);
   //Camera cam = camera_lookat(v3(0,0,-3),v3(0,0,-1), v3(0,1,0), 90.f, window_width / (f32)window_height, 0,1);
-  Hitable *list[5];
+  Hitable *list[8];
   list[0] = ALLOC(sizeof(Hitable));
   list[0]->type = TRIANGLE;
-  list[0]->t = (Triangle){v3(0,0,-5), v3(0,1,-5),v3(1,0,-5)};
+  //list[0]->t = (Triangle){v3(0,0,-4), v3(0,1,-4),v3(1,0,-4)};
+  list[0]->t = (Triangle){v3(0,0,-1),v3(1,0,-1),v3(0,1,-1)};
   list[0]->m = ALLOC(sizeof(Material));
   list[0]->m->type = LAMBERTIAN;
   list[0]->m->lm = (LambertianMaterial){v3(0.2f,0.2f,0.9f)};
@@ -48,7 +49,7 @@ main(void)
   list[1]->s = (Sphere){v3(0,-100.5f,-1.f), 100.f};
   list[1]->m = ALLOC(sizeof(Material));
   list[1]->m->type = LAMBERTIAN;
-  list[1]->m->lm = (LambertianMaterial){v3(0.3f,0.5f,0.f)};
+  list[1]->m->lm = (LambertianMaterial){v3(0.3f,0.5f,0.6f)};
   list[2] = ALLOC(sizeof(Hitable));
   list[2]->type = SPHERE;
   list[2]->s = (Sphere){v3(1.f,0,-1), 0.5f};
@@ -66,12 +67,18 @@ main(void)
   list[4]->s = (Sphere){v3(0,0,-1), 0.5f};
   list[4]->m = ALLOC(sizeof(Material));
   list[4]->m->type = LAMBERTIAN;
-  list[4]->m->lm = (LambertianMaterial){v3(0.9f,0.5f,0.5f)};
- 
+  list[4]->m->lm = (LambertianMaterial){v3(0.9f,0.3f,0.3f)};
+  list[5] = ALLOC(sizeof(Hitable));
+  list[5]->type = TRIANGLE;
+  list[5]->t = (Triangle){v3(0,0,-4), v3(2,2,-4), v3(0,2,-6)};
+  list[5]->m = ALLOC(sizeof(Material));
+  list[5]->m->type = LAMBERTIAN;
+  list[5]->m->lm = (LambertianMaterial){v3(0.9f,0.1f,0.0f)};
+
 
   HitableList hlist;
   hlist.list = list;
-  hlist.list_size = 5;
+  hlist.list_size = 6;
   printf("tracing rays\n");
   for (i32 i = 0; i < window_width * window_height; ++i)
   {

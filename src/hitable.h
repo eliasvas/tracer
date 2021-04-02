@@ -59,9 +59,57 @@ typedef struct Triangle
   vec3 v1;
   vec3 v2;
 }Triangle;
-
 internal i32 
 triangle_hit(Triangle tri, Ray r, f32 t_min, f32 t_max, HitRecord *rec)
+{
+
+	f32 thit, t, u, v;
+
+	vec3 v0v1 = vec3_sub(tri.v1, tri.v0);
+	vec3 v0v2 = vec3_sub(tri.v2, tri.v0);
+    vec3 normal = vec3_cross(v0v1, v0v2);
+	
+	vec3 pvec = vec3_cross(r.d, v0v2);
+	
+	f32 det = vec3_dot(pvec, v0v1);
+	//f32 det = vec3_dot(v0v1, pvec);
+	f32 kEpsilon = 0.00001;
+
+	// if the determinant is negative the triangle is backfacing
+	// if the determinant is close to 0, the ray misses the triangle
+	if (det < kEpsilon) return 0;
+
+	f32 invDet = 1 / det;
+	
+	vec3 tvec = vec3_sub(r.o,tri.v0);
+	u = vec3_dot(tvec, pvec) * invDet;
+	
+	if (u < 0 || u > 1) return 0;
+    
+	vec3 qvec = vec3_cross(tvec, v0v1);
+	v = vec3_dot(r.d, qvec) * invDet;
+	if (v < 0 || u + v > 1) return 0;
+
+    //if (r.type == RAY_PRIMARY)
+        //printf("intersection at P: %f %f %f\n", rec->p.x, rec->p.y, rec->p.z);
+
+
+	t = vec3_dot(v0v2, qvec) * invDet;
+
+	
+	if (t < 0  || t > t_max) return 0;
+
+	rec->p = ray_point_at(r,t);
+	rec->t = t;
+	rec->normal = normal;
+
+
+	return 1;
+}
+
+
+internal i32 
+triangle_hit2(Triangle tri, Ray r, f32 t_min, f32 t_max, HitRecord *rec)
 {
   //first we compute the planes (triangles) normal vector
   vec3 v0v1 = vec3_sub(tri.v1,tri.v0);
@@ -79,12 +127,13 @@ triangle_hit(Triangle tri, Ray r, f32 t_min, f32 t_max, HitRecord *rec)
 
   f32 t = (vec3_dot(N,r.o) + d) / n_dot_ray_dir;
   //we don't want things behind the ray to be rendered!
-  if (t < t_min || t > t_max)return 0;
+  if (t < 0)return 0;
 
-  vec3 P = vec3_add(r.o, vec3_mulf(r.d, t));
+  //vec3 P = vec3_add(r.o, vec3_mulf(r.d, t));
+  vec3 P = ray_point_at(r, t);
   
   //now we perform inside-outside test
-  vec3 C; //vector perpendiculat to triangle plane
+  vec3 C; //vector perpendicular to triangle plane
 
   vec3 edge0 = vec3_sub(tri.v1, tri.v0);
   vec3 vp0 = vec3_sub(P, tri.v0);
@@ -158,5 +207,4 @@ hitable_list_hit(HitableList *hl, Ray r, f32 t_min, f32 t_max, HitRecord *rec)
   }
   return hit_anything;
 }
-
 #endif

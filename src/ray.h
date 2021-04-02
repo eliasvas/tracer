@@ -18,12 +18,12 @@ typedef struct Ray
 }Ray;
 
 internal Ray
-ray_init(vec3 o, vec3 d)
+ray_init(vec3 o, vec3 d, RayType type)
 {
   Ray r;
   r.o = o;
   r.d = d;
-  r.type = RAY_PRIMARY;
+  r.type = type;
   return r;
 }
 
