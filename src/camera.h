@@ -50,8 +50,8 @@ camera_lookat(vec3 lookfrom, vec3 lookat, vec3 vup, f32 vfov, f32 aspect, f32 ap
   cam.v = vec3_cross(cam.w,cam.u);
   //llc = origin - u * ww/2 + v * wh/2 + forward
   cam.lower_left_corner = vec3_add(vec3_add(cam.origin, vec3_mulf(cam.u, -half_width * focus_dist)),vec3_add(vec3_mulf(cam.v, -half_height * focus_dist), vec3_mulf(cam.w, -1.f * focus_dist)));
-  cam.horizontal = vec3_mulf(cam.u, 2 * half_width * focus_dist);
-  cam.vertical = vec3_mulf(cam.v, 2 * half_height * focus_dist);
+  cam.horizontal = vec3_mulf(cam.u, 2* half_width * focus_dist);
+  cam.vertical = vec3_mulf(cam.v, 2* half_height * focus_dist);
 
   return cam;
 }

@@ -6,20 +6,21 @@
 /*TODO
     -[]Make a better random number generator
     -[]Triangles dont appear in positive z-coords?????
+    -[]Handedness changes for triangles?
 */
 
 internal u32 window_width = 800;
 internal u32 window_height= 400;
-internal u32 SAMPLES_PER_PIXEL = 8;
+internal u32 SAMPLES_PER_PIXEL = 4;
 
 internal vec3 color(Ray r, HitableList *world, i32 depth)
 {
   HitRecord rec;
-  if (hitable_list_hit(world, r, 0.001f, 10000.f, &rec))
+  if (hitable_list_hit(world, r, 0.01f, 30000.f, &rec))
   {
     Ray scattered;
     vec3 attenuation;
-    if (depth <5 && scatter(rec.m,r, &rec, &attenuation, &scattered))
+    if (depth <10 && scatter(rec.m,r, &rec, &attenuation, &scattered))
       return vec3_mul(attenuation, color(scattered, world, depth+1));
     else
       return v3(0,0,0);
@@ -33,17 +34,17 @@ internal i32
 main(void)
 {
   vec3 *framebuffer = ALLOC(sizeof(vec3) * window_width * window_height);
-  seed_random(23848);
-  Camera cam = camera_lookat(v3(5,5,1),v3(0,0,-1), v3(0,1,0), 45.f, window_width / (f32)window_height, 0,1);
-  //Camera cam = camera_lookat(v3(0,0,-3),v3(0,0,-1), v3(0,1,0), 90.f, window_width / (f32)window_height, 0,1);
+  seed_random(23842);
+  //Camera cam = camera_lookat(v3(5,5,1),v3(0,0,-1), v3(0,1,0), 45.f, window_width / (f32)window_height, 0,1);
+  Camera cam = camera_lookat(v3(0,2,0),v3(0,0,-1), v3(0,1,0), 90.f, window_width / (f32)window_height, 0,1);
   Hitable *list[8];
   list[0] = ALLOC(sizeof(Hitable));
   list[0]->type = TRIANGLE;
   //list[0]->t = (Triangle){v3(0,0,-4), v3(0,1,-4),v3(1,0,-4)};
-  list[0]->t = (Triangle){v3(0,0,-1),v3(1,0,-1),v3(0,1,-1)};
+  list[0]->t = (Triangle){v3(0,0,-3),v3(1,0,-3),v3(0,1,-3)};
   list[0]->m = ALLOC(sizeof(Material));
   list[0]->m->type = LAMBERTIAN;
-  list[0]->m->lm = (LambertianMaterial){v3(0.2f,0.2f,0.9f)};
+  list[0]->m->lm = (LambertianMaterial){v3(0.8f,0.2f,0.2f)};
   list[1] = ALLOC(sizeof(Hitable));
   list[1]->type = SPHERE;
   list[1]->s = (Sphere){v3(0,-100.5f,-1.f), 100.f};
@@ -68,17 +69,11 @@ main(void)
   list[4]->m = ALLOC(sizeof(Material));
   list[4]->m->type = LAMBERTIAN;
   list[4]->m->lm = (LambertianMaterial){v3(0.9f,0.3f,0.3f)};
-  list[5] = ALLOC(sizeof(Hitable));
-  list[5]->type = TRIANGLE;
-  list[5]->t = (Triangle){v3(0,0,-4), v3(2,2,-4), v3(0,2,-6)};
-  list[5]->m = ALLOC(sizeof(Material));
-  list[5]->m->type = LAMBERTIAN;
-  list[5]->m->lm = (LambertianMaterial){v3(0.9f,0.1f,0.0f)};
 
 
   HitableList hlist;
   hlist.list = list;
-  hlist.list_size = 6;
+  hlist.list_size = 5;
   printf("tracing rays\n");
   for (i32 i = 0; i < window_width * window_height; ++i)
   {
@@ -97,6 +92,7 @@ main(void)
       col = vec3_divf(col, SAMPLES_PER_PIXEL);
       //apply gamma correction
       col = v3(sqrt(col.x),sqrt(col.y),sqrt(col.z));
+      //if (col.x < 0.1f || col.y < 0.1f || col.z < 0.1f)printf("color[%i, %i] = (%f %f %f)\n", x,y, col.x, col.y,col.z);
       framebuffer[i] = v3(col.x,col.y,col.z);
   }
   printf("writing to disk\n");

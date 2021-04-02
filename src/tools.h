@@ -172,7 +172,7 @@ void seed_random(u32 seed)
 u32 random(void)
 {
     next_random = next_random * 1104859651 + 83497;
-    return (u32)(next_random / 65536) % 32768;
+    return (f32)((next_random / 65536) % 32768);
 }
 
 INLINE f32
@@ -180,7 +180,7 @@ random01(void)
 {
     //seed_random();
     f32 r = (f32)random();
-    r /= RAND_MAX;
+    r /= 32768;
     return r;
 }
 

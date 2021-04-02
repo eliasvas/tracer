@@ -97,7 +97,7 @@ triangle_hit(Triangle tri, Ray r, f32 t_min, f32 t_max, HitRecord *rec)
 	t = vec3_dot(v0v2, qvec) * invDet;
 
 	
-	if (t < 0  || t > t_max) return 0;
+	if (t < 0  || t > t_max || t < t_min) return 0;
 
 	rec->p = ray_point_at(r,t);
 	rec->t = t;
@@ -106,58 +106,6 @@ triangle_hit(Triangle tri, Ray r, f32 t_min, f32 t_max, HitRecord *rec)
 
 	return 1;
 }
-
-
-internal i32 
-triangle_hit2(Triangle tri, Ray r, f32 t_min, f32 t_max, HitRecord *rec)
-{
-  //first we compute the planes (triangles) normal vector
-  vec3 v0v1 = vec3_sub(tri.v1,tri.v0);
-  vec3 v0v2 = vec3_sub(tri.v2,tri.v0);
-  vec3 N = vec3_cross(v0v1, v0v2);
-  //N = vec3_normalize(N);
-  f32 area2 = vec3_length(N);
-
-  //(1) Lets first find the point of intersection P
-  f32 n_dot_ray_dir = vec3_dot(N,r.d);
-  //this is in case the triangle is paralell to ray
-  if (fabs(n_dot_ray_dir) < 0.0001f)
-    return 0;
-  f32 d = vec3_dot(N, tri.v0);
-
-  f32 t = (vec3_dot(N,r.o) + d) / n_dot_ray_dir;
-  //we don't want things behind the ray to be rendered!
-  if (t < 0)return 0;
-
-  //vec3 P = vec3_add(r.o, vec3_mulf(r.d, t));
-  vec3 P = ray_point_at(r, t);
-  
-  //now we perform inside-outside test
-  vec3 C; //vector perpendicular to triangle plane
-
-  vec3 edge0 = vec3_sub(tri.v1, tri.v0);
-  vec3 vp0 = vec3_sub(P, tri.v0);
-  C = vec3_cross(edge0,vp0);
-  if (vec3_dot(N,C) < 0)return 0;
-
-
-  vec3 edge1 = vec3_sub(tri.v2, tri.v1);
-  vec3 vp1 = vec3_sub(P, tri.v1);
-  C = vec3_cross(edge1,vp1);
-  if (vec3_dot(N,C) < 0)return 0;
-
-  vec3 edge2 = vec3_sub(tri.v0, tri.v2);
-  vec3 vp2 = vec3_sub(P, tri.v2);
-  C = vec3_cross(edge2,vp2);
-  if (vec3_dot(N,C) < 0)return 0;
-
-  rec->t = t;
-  rec->p = P;
-  rec->normal = N;
-
-  return 1;
-}
-
 
 
 typedef struct Hitable
