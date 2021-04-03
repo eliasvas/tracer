@@ -34,7 +34,7 @@ internal i32
 main(void)
 {
   vec3 *framebuffer = ALLOC(sizeof(vec3) * window_width * window_height);
-  seed_random(23842);
+  seed_random(23832);
   //Camera cam = camera_lookat(v3(5,5,1),v3(0,0,-1), v3(0,1,0), 45.f, window_width / (f32)window_height, 0,1);
   Camera cam = camera_lookat(v3(0,2,0),v3(0,0,-1), v3(0,1,0), 90.f, window_width / (f32)window_height, 0,1);
   Hitable *list[8];
