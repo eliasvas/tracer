@@ -3,20 +3,12 @@
 //This is the main library of this startup project, it has a couple image libraries, a hash map, a
 //dynamic array sean barrett style, an arena allocator, quaternions, matrices, vectors, all that. Use at your own risk!! :)
 
-#if defined(BUILD_WIN32)
-#include "windows.h"
-#endif
 
 #include <stdint.h>
-#include <time.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <stdio.h>
 #include <math.h>
-
-#if !defined(CRTLESS)
-#define CRTLESS 0
-#endif
 
 typedef uint8_t   u8;
 typedef int8_t    i8;
@@ -31,6 +23,12 @@ typedef double    f64;
 typedef int32_t   b32;
 typedef char      b8;
 
+#if !defined(TRUE)
+#define TRUE 1
+#endif
+#if !defined(FALSE)
+#define FALSE 0
+#endif
 #if !defined(internal)
 #define internal static
 #endif
@@ -61,10 +59,10 @@ INLINE f32 fabs2(f32 x)
 INLINE f32 
 cos_32s(f32 x)
 {
-    const float c1= 0.99940307;
-    const float c2=-0.49558072;
-    const float c3= 0.03679168;
-    float x2; // The input argument squared
+    f32 c1= 0.99940307;
+    f32 c2=-0.49558072;
+    f32 c3= 0.03679168;
+    f32 x2; // The input argument squared
     x2= x * x;
     return (c1 + x2*(c2 + c3 * x2));
 }

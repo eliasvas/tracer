@@ -44,6 +44,7 @@ internal void swap_floats(f32 *t0, f32 *t1)
 } 
 internal i32 aabb_hit(AABB aabb, Ray r, f32 t_min, f32 t_max)
 {
+    total_intersections++;
     for (i32 a = 0; a < 3; ++a)
     {
         f32 invD = 1.f / r.d.elements[a];
@@ -56,6 +57,7 @@ internal i32 aabb_hit(AABB aabb, Ray r, f32 t_min, f32 t_max)
         if (t_max <= t_min)
             return 0;
     }
+    //printf("aabb hit was succesful\n");
     return 1;
 }
 //used to e.g calculate the bounding box of a primitive over a time interval (where there are two boxes)
@@ -63,6 +65,7 @@ internal AABB surrounding_box(AABB box0, AABB box1)
 {
     vec3 small = v3(ffmin(box0.min.x, box1.min.x), ffmin(box0.min.y, box1.min.y), ffmin(box0.min.z, box1.min.z));
     vec3 big = v3(ffmax(box0.max.x, box1.max.x), ffmax(box0.max.y, box1.max.y), ffmax(box0.max.z, box1.max.z));
+    //printf("L66: bounding box generated: MIN[%f %f %f], MAX[%f %f %f]\n", small.x, small.y, small.z, big.x, big.y, big.z);
     return aabb_init(small, big);
 }
 
@@ -75,6 +78,7 @@ typedef struct Sphere
 internal i32 sphere_bounding_box(Sphere s,f32 t0, f32 t1, AABB *box)
 {
     *box = aabb_init(vec3_sub(s.center, v3(s.radius,s.radius,s.radius)), vec3_add(s.center, v3(s.radius, s.radius, s.radius)));
+    //printf("SPHERE: bounding box generated: MIN[%f %f %f], MAX[%f %f %f]\n", box->min.x, box->min.y, box->min.z, box->max.x, box->max.y, box->max.z);
     return 1;//1 means that the bounding box has been made, for shapes such as infinite planes this is not possible
 }
 
@@ -211,6 +215,12 @@ vec3 max = v3(ffmax(tri.v0.x, ffmax(tri.v1.x, tri.v2.x)),
     return 1;//1 means that the bounding box has been made, for shapes such as infinite planes this is not possible
 }
 
+internal i32 box_bounding_box(AABB aabb,f32 t0, f32 t1, AABB *box)
+{
+    *box = aabb;
+    return 1;//1 means that the bounding box has been made, for shapes such as infinite planes this is not possible
+}
+
 typedef struct Hitable Hitable;//is this legal? -I'll make it legal!!
 typedef struct BVHNode
 {
@@ -258,12 +268,20 @@ internal i32 hitable_bounding_box(Hitable *hitable, f32 t0, f32 t1, AABB *box)
         return triangle_bounding_box(hitable->t,t0, t1, box);
     else if (hitable->type == SPHERE)
         return sphere_bounding_box(hitable->s, t0, t1, box);
+    else if (hitable->type == BOX)
+        return box_bounding_box(hitable->box, t0, t1, box);
+    else if (hitable->type == BVH_NODE)
+        return box_bounding_box(hitable->node.box, t0, t1, box);
+
 }
 
 internal i32 bvh_hit(BVHNode node, Ray r, f32 t_min, f32 t_max, HitRecord *rec)
 {
+    //for some reason aabb hit never succeeds
+    //printf("min(%f, %f, %f) max(%f, %f, %f)\n", node.box.min.x, node.box.min.y, node.box.min.z, node.box.max.x, node.box.max.y, node.box.max.z);
     if (aabb_hit(node.box, r, t_min, t_max))
     {
+        //printf("we got a BVH hit in bvh_hit()!!!\n");
         HitRecord left_rec, right_rec;
         i32 hit_left = hitable_hit(node.left, r, t_min, t_max, &left_rec);
         i32 hit_right = hitable_hit(node.right, r, t_min, t_max, &right_rec);
@@ -356,9 +374,9 @@ i32 box_z_compare(void *a, void *b)
     //TODO check if bounding box was made correctly (function returns 1)
     hitable_bounding_box(ah, 0, 0, &left_box);
     hitable_bounding_box(ah, 0, 0, &right_box);
-    if (left_box.min.z  -  right_box.min.z < 0)
+    if (left_box.min.z - right_box.min.z < 0)
         return -1;
-    else 
+    else
         return 1;
 
 }

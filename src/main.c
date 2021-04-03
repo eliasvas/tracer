@@ -4,19 +4,21 @@
 #include "camera.h"
 #include "material.h"
 /*TODO
-    -[]Make a better random number generator
-    -[]Triangles dont appear in positive z-coords?????
+    -[]replace qsort!
     -[]Handedness changes for triangles?
+    -[]Make ppm output with just one fwrite statement (-maximum cross platformness)
 */
 
 internal u32 window_width = 800;
 internal u32 window_height= 400;
 internal u32 SAMPLES_PER_PIXEL = 4;
-
+internal BVHNode root;
 internal vec3 color(Ray r, HitableList *world, i32 depth)
 {
   HitRecord rec;
-  if (hitable_list_hit(world, r, 0.01f, 30000.f, &rec))
+
+  //if (hitable_list_hit(world, r, 0.01f, 30000.f, &rec))
+  if (bvh_hit(root, r, 0.01f, 30000.f, &rec))
   {
     Ray scattered;
     vec3 attenuation;
@@ -34,13 +36,12 @@ internal i32
 main(void)
 {
   vec3 *framebuffer = ALLOC(sizeof(vec3) * window_width * window_height);
-  seed_random(23832);
+  seed_random((int)framebuffer); //framebufferframebuffer  is a random number
   //Camera cam = camera_lookat(v3(5,5,1),v3(0,0,-1), v3(0,1,0), 45.f, window_width / (f32)window_height, 0,1);
   Camera cam = camera_lookat(v3(0,2,0),v3(0,0,-1), v3(0,1,0), 90.f, window_width / (f32)window_height, 0,1);
   Hitable *list[8];
   list[0] = ALLOC(sizeof(Hitable));
   list[0]->type = TRIANGLE;
-  //list[0]->t = (Triangle){v3(0,0,-4), v3(0,1,-4),v3(1,0,-4)};
   list[0]->t = (Triangle){v3(0,0,-3),v3(1,0,-3),v3(0,1,-2.5)};
   list[0]->m = ALLOC(sizeof(Material));
   list[0]->m->type = LAMBERTIAN;
@@ -74,6 +75,8 @@ main(void)
   HitableList hlist;
   hlist.list = list;
   hlist.list_size = 5;
+
+  root = construct_bvh_tree(hlist.list, hlist.list_size, 0, 1);
   printf("tracing rays\n");
   for (i32 i = 0; i < window_width * window_height; ++i)
   {
