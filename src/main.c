@@ -41,10 +41,10 @@ main(void)
   list[0] = ALLOC(sizeof(Hitable));
   list[0]->type = TRIANGLE;
   //list[0]->t = (Triangle){v3(0,0,-4), v3(0,1,-4),v3(1,0,-4)};
-  list[0]->t = (Triangle){v3(0,0,-3),v3(1,0,-3),v3(0,1,-3)};
+  list[0]->t = (Triangle){v3(0,0,-3),v3(1,0,-3),v3(0,1,-2.5)};
   list[0]->m = ALLOC(sizeof(Material));
   list[0]->m->type = LAMBERTIAN;
-  list[0]->m->lm = (LambertianMaterial){v3(0.8f,0.2f,0.2f)};
+  list[0]->m->lm = (LambertianMaterial){v3(0.5f,0.2f,0.2f)};
   list[1] = ALLOC(sizeof(Hitable));
   list[1]->type = SPHERE;
   list[1]->s = (Sphere){v3(0,-100.5f,-1.f), 100.f};
@@ -95,6 +95,7 @@ main(void)
       //if (col.x < 0.1f || col.y < 0.1f || col.z < 0.1f)printf("color[%i, %i] = (%f %f %f)\n", x,y, col.x, col.y,col.z);
       framebuffer[i] = v3(col.x,col.y,col.z);
   }
+  printf("total intersections performed: %i\n", total_intersections);
   printf("writing to disk\n");
   ppm_save_pixels(window_width, window_height, (f32*)framebuffer);
   printf("finished\n");

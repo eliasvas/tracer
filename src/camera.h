@@ -10,6 +10,9 @@ typedef struct Camera
   vec3 v;
   vec3 w;
   f32 lens_radius;
+  //time interval for motion blur
+  f32 time0;
+  f32 time1;
 }Camera;
 
 
@@ -30,7 +33,9 @@ get_ray(Camera *c, f32 u, f32 v)
 {
   vec3 rd = vec3_mulf(random_in_unit_disk(), c->lens_radius);
   vec3 offset = vec3_add(vec3_mulf(c->u,rd.x), vec3_mulf(c->v,rd.y));
-  return ray_init(vec3_add(c->origin, offset), vec3_sub(vec3_sub(vec3_add(c->lower_left_corner, vec3_add(vec3_mulf(c->horizontal, u), vec3_mulf(c->vertical, v))), c->origin),offset), RAY_PRIMARY); 
+  f32 time = c->time0 + random01() * (c->time1 - c->time0);
+  return ray_init(vec3_add(c->origin, offset), vec3_sub(vec3_sub(vec3_add(c->lower_left_corner, vec3_add(vec3_mulf(c->horizontal, u), vec3_mulf(c->vertical, v))), c->origin),offset), 
+          time,RAY_PRIMARY); 
 }
 internal Camera 
 camera_lookat(vec3 lookfrom, vec3 lookat, vec3 vup, f32 vfov, f32 aspect, f32 aperture, f32 focus_dist)
@@ -52,6 +57,8 @@ camera_lookat(vec3 lookfrom, vec3 lookat, vec3 vup, f32 vfov, f32 aspect, f32 ap
   cam.lower_left_corner = vec3_add(vec3_add(cam.origin, vec3_mulf(cam.u, -half_width * focus_dist)),vec3_add(vec3_mulf(cam.v, -half_height * focus_dist), vec3_mulf(cam.w, -1.f * focus_dist)));
   cam.horizontal = vec3_mulf(cam.u, 2* half_width * focus_dist);
   cam.vertical = vec3_mulf(cam.v, 2* half_height * focus_dist);
+  cam.time0 = 1;
+  cam.time1 = 0;
 
   return cam;
 }
