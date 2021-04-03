@@ -340,7 +340,7 @@ i32 box_y_compare(void *a, void *b)
     //TODO check if bounding box was made correctly (function returns 1)
     hitable_bounding_box(ah, 0, 0, &left_box);
     hitable_bounding_box(ah, 0, 0, &right_box);
-    if (left_box.min.y  -  right_box.min.y < 0)
+    if (left_box.min.y - right_box.min.y < 0)
         return -1;
     else 
         return 1;
@@ -366,7 +366,7 @@ i32 box_z_compare(void *a, void *b)
 
 
 //void qsort(void *base, size_t nitems, size_t size, int (*compar)(const void *, const void*))
-internal BVHNode construct_bvh_tree(HitableList *hl, i32 size, f32 time0, f32 time1) //hitable list may just have to be a Hitable after all.....
+internal BVHNode construct_bvh_tree(Hitable **h, i32 size, f32 time0, f32 time1) //hitable list may just have to be a Hitable after all.....
 {
     BVHNode node;
     //1) randomly choose an axis
@@ -374,23 +374,35 @@ internal BVHNode construct_bvh_tree(HitableList *hl, i32 size, f32 time0, f32 ti
     //2) sort based on that axis
     if (axis == 0)
     {
-        qsort(hl->list, size, sizeof(Hitable *), box_x_compare);
+        qsort(h, size, sizeof(Hitable *), box_x_compare);
     }else if (axis == 1)
     {
-        qsort(hl->list, size, sizeof(Hitable *), box_y_compare);
+        qsort(h, size, sizeof(Hitable *), box_y_compare);
     }else 
     {
-        qsort(hl->list, size, sizeof(Hitable *), box_z_compare);
+        qsort(h, size, sizeof(Hitable *), box_z_compare);
     }
     if (size == 1)
     {
-        node.left = hl->list[0];
-        node.right = hl->list[0];
+        node.left = h[0];
+        node.right = h[0];
     }
     else if (size == 2)
     {
-        node.left = hl->list[0];
-        node.right = hl->list[1];
+        node.left = h[0];
+        node.right = h[1];
+    }
+    else 
+    {
+        //we divide in two parts and make the Hitables, current node's children
+        node.left = ALLOC(sizeof(Hitable));
+        node.left->node = construct_bvh_tree(h, size/2, time0, time1);
+        node.left->m = NULL;
+        node.left->type = BVH_NODE;
+        node.right = ALLOC(sizeof(Hitable));
+        node.right->node = construct_bvh_tree(h + size/2, size - size/2, time0, time1);
+        node.right->m = NULL;
+        node.right->type = BVH_NODE;
     }
     //3) calc the bvh node's bounding box
     AABB left_box, right_box;
