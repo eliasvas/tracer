@@ -3,6 +3,7 @@
 #include "hitable.h"
 #include "camera.h"
 #include "material.h"
+#include "time.h"
 /*TODO
     -[]replace qsort!
     -[]Handedness changes for triangles?
@@ -13,6 +14,9 @@ internal u32 window_width = 800;
 internal u32 window_height= 400;
 internal u32 SAMPLES_PER_PIXEL = 4;
 internal BVHNode root;
+internal Texture red;
+internal Texture blue;
+internal Texture checker_texture;
 internal vec3 color(Ray r, HitableList *world, i32 depth)
 {
   HitRecord rec;
@@ -35,23 +39,27 @@ internal vec3 color(Ray r, HitableList *world, i32 depth)
 internal i32 
 main(void)
 {
+  checker_texture = checker_texture_init(v3(0.9,0.9,0.9), v3(0.2,0.7,0.1));
+  red = constant_texture_init(v3(0.9,0.2,0.2));
+  blue = constant_texture_init(v3(0.4,0.4,0.9));
+  clock_t clk = clock();
   vec3 *framebuffer = ALLOC(sizeof(vec3) * window_width * window_height);
   seed_random((int)framebuffer); //framebufferframebuffer  is a random number
   //Camera cam = camera_lookat(v3(5,5,1),v3(0,0,-1), v3(0,1,0), 45.f, window_width / (f32)window_height, 0,1);
-  Camera cam = camera_lookat(v3(0,2,0),v3(0,0,-1), v3(0,1,0), 90.f, window_width / (f32)window_height, 0,1);
-  Hitable *list[8];
+  Camera cam = camera_lookat(v3(0,1,0.5),v3(0,0,-1), v3(0,1,0), 90.f, window_width / (f32)window_height, 0,1);
+  Hitable *list[100];
   list[0] = ALLOC(sizeof(Hitable));
   list[0]->type = TRIANGLE;
   list[0]->t = (Triangle){v3(0,0,-3),v3(1,0,-3),v3(0,1,-2.5)};
   list[0]->m = ALLOC(sizeof(Material));
   list[0]->m->type = LAMBERTIAN;
-  list[0]->m->lm = (LambertianMaterial){v3(0.5f,0.2f,0.2f)};
+  list[0]->m->lm = (LambertianMaterial){&blue};
   list[1] = ALLOC(sizeof(Hitable));
   list[1]->type = SPHERE;
-  list[1]->s = (Sphere){v3(0,-100.5f,-1.f), 100.f};
+  list[1]->s = (Sphere){v3(0,-500.5f,-1.f), 500.f};
   list[1]->m = ALLOC(sizeof(Material));
   list[1]->m->type = LAMBERTIAN;
-  list[1]->m->lm = (LambertianMaterial){v3(0.3f,0.5f,0.6f)};
+  list[1]->m->lm = (LambertianMaterial){&checker_texture};
   list[2] = ALLOC(sizeof(Hitable));
   list[2]->type = SPHERE;
   list[2]->s = (Sphere){v3(1.f,0,-1), 0.5f};
@@ -69,8 +77,7 @@ main(void)
   list[4]->s = (Sphere){v3(0,0,-1), 0.5f};
   list[4]->m = ALLOC(sizeof(Material));
   list[4]->m->type = LAMBERTIAN;
-  list[4]->m->lm = (LambertianMaterial){v3(0.9f,0.3f,0.3f)};
-
+  list[4]->m->lm = (LambertianMaterial){&red};
 
   HitableList hlist;
   hlist.list = list;
@@ -101,5 +108,7 @@ main(void)
   printf("total intersections performed: %i\n", total_intersections);
   printf("writing to disk\n");
   ppm_save_pixels(window_width, window_height, (f32*)framebuffer);
-  printf("finished\n");
+  clk = clock() - clk;
+  f32 end_time = (f32)clk / CLOCKS_PER_SEC;
+  printf("finished in %.2f seconds\n", end_time);
 }

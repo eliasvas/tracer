@@ -2,6 +2,7 @@
 #define MATERIAL_H
 #include "tools.h"
 #include "hitable.h"
+#include "texture.h"
 
 internal vec3 
 random_in_unit_sphere(void)
@@ -22,14 +23,14 @@ typedef enum MaterialType
 
 typedef struct LambertianMaterial
 {
-  vec3 albedo;
+    Texture *albedo;
 }LambertianMaterial;
 
 internal i32 lambertian_scatter(LambertianMaterial *m, Ray r, HitRecord *rec, vec3 *attenuation, Ray *scattered)
 {
   vec3 target = vec3_add(rec->p, vec3_add(rec->normal, random_in_unit_sphere())); 
   *scattered = ray_init(rec->p, vec3_sub(target, rec->p), r.time, RAY_REFLECTION);
-  *attenuation = m->albedo;
+  *attenuation = texture_value(m->albedo, 0,0,rec->p);
   return 1;
 }
 
