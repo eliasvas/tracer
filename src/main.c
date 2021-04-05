@@ -8,6 +8,7 @@
     -[]replace qsort!
     -[]Handedness changes for triangles?
     -[]Make ppm output with just one fwrite statement (-maximum cross platformness)
+    -[] U and V variables should be update at the hitrecord
 */
 
 internal u32 window_width = 800;
@@ -16,6 +17,7 @@ internal u32 SAMPLES_PER_PIXEL = 4;
 internal BVHNode root;
 internal Texture red;
 internal Texture blue;
+internal Texture white;
 internal Texture checker_texture;
 internal Texture noise_texture;
 internal Texture image_texture;
@@ -28,15 +30,18 @@ internal vec3 color(Ray r, HitableList *world, i32 depth)
   {
     Ray scattered;
     vec3 attenuation;
-    if (depth <10 && scatter(rec.m,r, &rec, &attenuation, &scattered))
-      return vec3_mul(attenuation, color(scattered, world, depth+1));
+    vec3 emitted = emit(rec.m, rec.u, rec.v, rec.p);
+    if (depth <50 && scatter(rec.m,r, &rec, &attenuation, &scattered))
+      return vec3_add(emitted,vec3_mul(attenuation, color(scattered, world, depth+1)));
     else
-      return v3(0,0,0);
+      return emitted;//for light materials there is no bounce, so they are colored like so
   }
+  /*
   vec3 unit_direction = vec3_normalize(r.d);
   f32 t = 0.5f * (unit_direction.y + 1.f);
   return vec3_add(vec3_mulf(v3(1.f,1.f,1.f),1.f - t), vec3_mulf(v3(0.5, 0.4f,0.7f), t));
-
+  */
+  return v3(0,0,0);
 }
 internal i32 
 main(void)
@@ -49,12 +54,13 @@ main(void)
   checker_texture = checker_texture_init(v3(0.9,0.9,0.9), v3(0.2,0.7,0.1));
   image_texture = image_texture_init("../texture.tga");
   red = constant_texture_init(v3(0.9,0.2,0.2));
+  white = constant_texture_init(v3(1,1,1));
   blue = constant_texture_init(v3(0.4,0.4,0.9));
   clock_t clk = clock();
   vec3 *framebuffer = ALLOC(sizeof(vec3) * window_width * window_height);
   seed_random((int)framebuffer); //framebufferframebuffer  is a random number
   //Camera cam = camera_lookat(v3(5,5,1),v3(0,0,-1), v3(0,1,0), 45.f, window_width / (f32)window_height, 0,1);
-  Camera cam = camera_lookat(v3(0,1,0.5),v3(0,0,-1), v3(0,1,0), 90.f, window_width / (f32)window_height, 0,1);
+  Camera cam = camera_lookat(v3(0,1,1),v3(0,0,-1), v3(0,1,0), 90.f, window_width / (f32)window_height, 0,1);
   Hitable *list[100];
   list[0] = ALLOC(sizeof(Hitable));
   list[0]->type = TRIANGLE;
@@ -86,10 +92,17 @@ main(void)
   list[4]->m = ALLOC(sizeof(Material));
   list[4]->m->type = LAMBERTIAN;
   list[4]->m->lm = (LambertianMaterial){&image_texture};
+  list[5] = ALLOC(sizeof(Hitable));
+  list[5]->type = SPHERE;
+  list[5]->s = (Sphere){v3(0,0,0), 0.5f};
+  list[5]->m = ALLOC(sizeof(Material));
+  list[5]->m->type = DIFFUSE_LIGHT;
+  list[5]->m->dl = (DiffuseLightMaterial){&white};
+
 
   HitableList hlist;
   hlist.list = list;
-  hlist.list_size = 5;
+  hlist.list_size = 6;
 
   root = construct_bvh_tree(hlist.list, hlist.list_size, 0, 1);
   printf("tracing rays\n");

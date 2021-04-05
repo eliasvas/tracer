@@ -19,6 +19,7 @@ typedef enum MaterialType
   LAMBERTIAN = 1,
   METAL = 2,
   DIELECTRIC = 3,
+  DIFFUSE_LIGHT = 4,
 }MaterialType;
 
 typedef struct LambertianMaterial
@@ -106,6 +107,11 @@ internal i32 dielectric_scatter(DielectricMaterial *m, Ray r, HitRecord *rec, ve
   }
   return 1;
 }
+
+typedef struct DiffuseLightMaterial
+{
+    Texture *emit;
+}DiffuseLightMaterial;
 typedef struct Material
 {
   union
@@ -113,6 +119,7 @@ typedef struct Material
     LambertianMaterial lm;
     MetalMaterial mm;
     DielectricMaterial dm;
+    DiffuseLightMaterial dl;
   };
   MaterialType type;
 }Material;
@@ -125,7 +132,21 @@ internal i32 scatter(Material *m,Ray r, HitRecord *rec,vec3 *attenuation,Ray* sc
     return metal_scatter(&m->mm,r, rec, attenuation, scattered);
   else if (m->type == DIELECTRIC)
     return dielectric_scatter(&m->dm,r, rec, attenuation, scattered);
+  else if (m->type == DIFFUSE_LIGHT)
+      return 0;
   return 0; 
     
+}
+
+internal vec3 diffuse_light_emit(DiffuseLightMaterial *m, f32 u, f32 v, vec3 p)
+{
+    return texture_value(m->emit, u, v, p);
+}
+
+internal vec3 emit(Material *m, f32 u, f32 v, vec3 p)
+{
+    if (m->type == DIFFUSE_LIGHT)
+        return diffuse_light_emit(&m->dl, u,v,p);
+    return v3(0,0,0); //base case (used in all NON emitting materialsm like lambertian and reflection)
 }
 #endif

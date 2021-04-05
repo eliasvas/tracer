@@ -8,6 +8,8 @@ typedef struct Material Material;
 typedef struct HitRecord
 {
   f32 t;
+  f32 u;
+  f32 v;
   vec3 p;
   vec3 normal;
   Material *m;
