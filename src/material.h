@@ -30,8 +30,13 @@ internal i32 lambertian_scatter(LambertianMaterial *m, Ray r, HitRecord *rec, ve
 {
   vec3 target = vec3_add(rec->p, vec3_add(rec->normal, random_in_unit_sphere())); 
   *scattered = ray_init(rec->p, vec3_sub(target, rec->p), r.time, RAY_REFLECTION);
-  *attenuation = texture_value(m->albedo, 0,0,rec->p);
-  return 1;
+  f32 u, v;
+  get_sphere_uv(rec->p, &u,&v);
+  //printf("%f %f\n", u, v);
+  //u = random01();
+  //v = random01();
+  *attenuation = texture_value(m->albedo, u,v,rec->p);
+  return TRUE;
 }
 
 

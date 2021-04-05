@@ -148,6 +148,15 @@ sphere_hit(Sphere s, Ray r, f32 t_min, f32 t_max, HitRecord *rec)
   }
   return 0;
 }
+
+//TODO: investigate
+internal void get_sphere_uv(vec3 p, f32 *u, f32 *v)
+{
+    f32 phi = atan2(p.z, p.x);
+    f32 theta = asin(p.y);
+    *u = 1 - (phi + PI) / (2 * PI);
+    *v = (theta + PI/2) / PI;
+}
 typedef struct Triangle 
 {
   vec3 v0;

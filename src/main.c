@@ -17,6 +17,8 @@ internal BVHNode root;
 internal Texture red;
 internal Texture blue;
 internal Texture checker_texture;
+internal Texture noise_texture;
+internal Texture image_texture;
 internal vec3 color(Ray r, HitableList *world, i32 depth)
 {
   HitRecord rec;
@@ -39,7 +41,13 @@ internal vec3 color(Ray r, HitableList *world, i32 depth)
 internal i32 
 main(void)
 {
+  perlin.ranfloat = perlin_generate();
+  perlin.perm_x = perlin_generate_perm();
+  perlin.perm_y = perlin_generate_perm();
+  perlin.perm_z = perlin_generate_perm();
+  noise_texture = noise_texture_init(perlin);
   checker_texture = checker_texture_init(v3(0.9,0.9,0.9), v3(0.2,0.7,0.1));
+  image_texture = image_texture_init("../texture.tga");
   red = constant_texture_init(v3(0.9,0.2,0.2));
   blue = constant_texture_init(v3(0.4,0.4,0.9));
   clock_t clk = clock();
@@ -53,7 +61,7 @@ main(void)
   list[0]->t = (Triangle){v3(0,0,-3),v3(1,0,-3),v3(0,1,-2.5)};
   list[0]->m = ALLOC(sizeof(Material));
   list[0]->m->type = LAMBERTIAN;
-  list[0]->m->lm = (LambertianMaterial){&blue};
+  list[0]->m->lm = (LambertianMaterial){&red};
   list[1] = ALLOC(sizeof(Hitable));
   list[1]->type = SPHERE;
   list[1]->s = (Sphere){v3(0,-500.5f,-1.f), 500.f};
@@ -77,7 +85,7 @@ main(void)
   list[4]->s = (Sphere){v3(0,0,-1), 0.5f};
   list[4]->m = ALLOC(sizeof(Material));
   list[4]->m->type = LAMBERTIAN;
-  list[4]->m->lm = (LambertianMaterial){&red};
+  list[4]->m->lm = (LambertianMaterial){&image_texture};
 
   HitableList hlist;
   hlist.list = list;
